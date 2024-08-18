@@ -179,7 +179,7 @@ OLD_DEFS		= $(TCL_DEFS) @DEFS@ $(PKG_CFLAGS)
 DEFS		= @DEFS@ $(PKG_CFLAGS)
 
 # Move pkgIndex.tcl to 'BINARIES' var if it is generated in the Makefile
-CONFIG_CLEAN_FILES = Makefile pkgIndex.tcl scotty config.h.in \
+CONFIG_CLEAN_FILES = Makefile pkgIndex.tcl scotty config.h \
 			ether.x mount.x pcnfsd.x rstat.x
 CLEANFILES	= @CLEANFILES@
 
@@ -680,10 +680,10 @@ clean:	clean-man
 	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean: clean
-	-rm -f *.tab.c
+	-rm -f *.tab.c *~ tclconfig/*~
 	-rm -f $(CONFIG_CLEAN_FILES)
 	-rm -f config.cache config.log config.status
-	-rm -rf autom4te.cache
+	-rm -rf autom4te.cache || rmdir autom4te.cache
 
 #========================================================================
 # Install binary object libraries.  On Windows this includes both .dll and

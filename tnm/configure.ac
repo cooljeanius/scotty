@@ -395,6 +395,7 @@ CLEANFILES="${CLEANFILES} ether_* ether.h"
 CLEANFILES="${CLEANFILES} mount_* mount.h"
 CLEANFILES="${CLEANFILES} pcnfsd_* pcnfsd.h"
 CLEANFILES="${CLEANFILES} rstat_* rstat.h"
+CLEANFILES="${CLEANFILES} autoscan.log"
 
 if test "x${TEA_PLATFORM}" = "xwindows"; then
     # Ensure no empty if clauses
