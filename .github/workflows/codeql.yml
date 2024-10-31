@@ -50,7 +50,8 @@ jobs:
       matrix:
         language: ['c-cpp']
         # CodeQL supports:
-        # ['c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'swift']
+        # 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript',
+        # 'python', 'ruby', 'swift'
         # Use 'java-kotlin' to analyze code written in Java, Kotlin, or both
         # Use 'javascript-typescript' to analyze code written in JavaScript,
         # TypeScript, or both
@@ -145,7 +146,8 @@ jobs:
             pushd "${subdir}"; \
             for srcfile in *.c; do \
               echo "attempting to use $(which make) to compile ${srcfile} in ${subdir}"; \
-              make "$(echo "${srcfile}" | sed "s/\.c/.o/g")" CFLAGS="-w -Wno-error -Wfatal-errors -I. -I.. -I../generic -I/usr/include/tirpc" || stat -t "${srcfile}"; \
+              make "$(echo "${srcfile}" | sed "s/\.c/.o/g")" CFLAGS="-w -Wno-error -Wfatal-errors -I. -I.. -I../generic -I/usr/include/tirpc" || \
+                stat -t "${srcfile}"; \
             done; \
             popd; \
           done
@@ -155,10 +157,12 @@ jobs:
             cobjfile="$(echo "${cfile}" | sed "s/\.c/.o/g")"; \
             if test ! -e "${cobjfile}"; then \
               echo "One last attempt at compiling ${cfile}..."; \
-              gcc -c -I. -I.. "${cfile}" || stat "${cfile}" || echo "cfile is ${cfile}"; \
+              gcc -c -I. -I.. "${cfile}" || \
+                stat "${cfile}" || echo "cfile is ${cfile}"; \
             else \
               echo "object file ${cobjfile} already exists for ${cfile}."; \
-              cp -v "${cobjfile}" "$(dirname "${cfile}")" || cp -v "${cobjfile}" . || cp -v "${cobjfile}" ..; \
+              cp -v "${cobjfile}" "$(dirname "${cfile}")" || \
+                cp -v "${cobjfile}" . || cp -v "${cobjfile}" ..; \
             fi; \
           done
 
