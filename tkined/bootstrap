@@ -12,6 +12,8 @@ if [ -n "$1" ]; then
     shift
 fi
 
-autoheader
-autoconf
+set -ex;
+
+autoheader -Wno-obsolete
+autoconf -Wno-obsolete
 ./configure --prefix=$PREFIX --exec-prefix=$PREFIX "$@"
