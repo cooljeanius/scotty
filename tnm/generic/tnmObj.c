@@ -555,7 +555,7 @@ UpdateStringOfUnsigned32(Tcl_Obj *objPtr)
     TnmUnsigned32 u = (TnmUnsigned32) objPtr->internalRep.longValue;
 
     objPtr->bytes = Tcl_Alloc(30);
-    objPtr->length = sprintf(objPtr->bytes, "%lu", u);
+    objPtr->length = sprintf(objPtr->bytes, "%u", u);
 }
 
 /*
