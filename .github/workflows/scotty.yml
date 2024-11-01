@@ -15,12 +15,14 @@ jobs:
         # GitHub Actions
       - name: Dependencies 1
         run: |
+          echo "Updating package lists..."
           if [[ "${{ runner.os }}" == "macOS" ]]; then \
             brew update; \
           elif [[ "${{ runner.os }}" == "Linux" ]]; then \
             sudo apt-get update; fi
       - name: Dependencies 2
         run: |
+          echo "Installing dependencies..."
           # Be careful here: libtirpc is listed on Homebrew's package list, but
           # it's only available via Linuxbrew...
           if [[ "${{ runner.os }}" == "macOS" ]]; then \
@@ -32,12 +34,14 @@ jobs:
           fi
       - name: Dependencies 3
         run: |
+          if test -d /opt && test -r /opt; then ls /opt; fi
           if [[ "${{ runner.os }}" == "macOS" ]]; then \
             brew link --force --overwrite tcl-tk; \
           elif [[ "${{ runner.os }}" == "Linux" ]]; then \
             find . -name arpa/nameser.h; fi
       - name: Dependencies 4
         run: |
+          sync && pwd
           if test -x /home/linuxbrew/.linuxbrew/bin/brew; then \
             eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"; \
             brew install --verbose tcl-tk libtirpc; \
