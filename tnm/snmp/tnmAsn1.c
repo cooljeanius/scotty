@@ -310,8 +310,8 @@ TnmBerSetError(TnmBer *ber, char *msg)
 void
 TnmBerWrongValue(TnmBer *ber, u_char tag)
 {
-    sprintf(ber->error, "invalid value for tag 0x%.2x at byte %d",
-	    tag, ber->current - ber->start);
+    sprintf(ber->error, "invalid value for tag 0x%.2x at byte %ld",
+	    tag, (long)(ber->current - ber->start));
 }
 
 /*
