@@ -78,6 +78,21 @@ jobs:
           # https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
           # queries: security-extended,security-and-quality
 
+      - name: Cache object files
+        id: vcpkg-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            vcpkg_installed
+            **/vcpkg_installed
+            /usr/local/share/vcpkg/buildtrees
+          # the final key part needs to be changed if anything in the build
+          # process changes that is not already included here
+          key: vcpkg-cache-master-${{ hashFiles('.github/workflows/codeql.yml') }}-${{ hashFiles('Makefile') }}-0001
+          restore-keys: |
+            vcpkg-cache-master-${{ hashFiles('.github/workflows/codeql.yml') }}--0001
+            vcpkg-cache-master--${{ hashFiles('Makefile') }}-0001
+
       - name: Dependencies
         run: |
           sudo apt-get -qq update
@@ -90,32 +105,48 @@ jobs:
             libpam-winbind traceroute libnet-traceroute-perl snmp libsnmp-dev \
             libnetsnmptrapd40 libntirpc3.5 libsnmp-perl smistrip
           if test -x /home/linuxbrew/.linuxbrew/bin/brew; then \
+            sync && echo "linuxbrew found; attempting to use it..."; \
             eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"; \
+            env | uniq | sort | uniq | grep -v "\*\*\*" | grep -v "PWD\="; \
             time brew install --verbose tcl-tk libtirpc sqlite-analyzer; \
+          else \
+            echo "skipping linuxbrew"; \
           fi
           if test -x "$(which gem)"; then \
             sync && echo "using $(which gem) to install some things..."; \
             sudo gem install tcl-msgcat tcl-ruby; \
+          else \
+            echo "skipping rubygems"; \
           fi
           if test -x "$(which npm)"; then \
             sync && echo "using $(which npm) to install some things..."; \
             time npm install tcl tcl-js; \
+          else \
+            echo "skipping npm"; \
           fi
           if test -x "$(which conda)"; then \
             sync && echo "using $(which conda) to install something..."; \
             time conda -v install r-tcltk2; \
+          else \
+            echo "skipping conda"; \
           fi
           if test -x "$(which vcpkg)"; then \
             sync && echo "giving $(which vcpkg) a try..."; \
             time vcpkg install tcl; \
+          else \
+            echo "skipping vcpkg"; \
           fi
           if test -x "$(which yarn)"; then \
             sync && echo "using $(which yarn) to install some things..."; \
             time yarn add tcl tcl-js; \
+          else \
+            echo "skipping yarn"; \
           fi
           if test -x "$(which cpan)"; then \
             echo "using $(which cpan) to install some things..."; \
             sudo cpan i Tcl Test::Tk Tk::Tree Tk::Trace Tk::FileTree; \
+          else \
+            echo "skipping cpan"; \
           fi
 
       # Autobuild attempts to build any compiled languages
@@ -146,10 +177,11 @@ jobs:
           for subdir in tkined/generic tkined/unix tkined/win tnm tnm/compat \
                         tnm/generic tnm/snmp tnm/unix tnm/win; do \
             pushd "${subdir}"; \
+            export CPPFLAGS="-I. -I.. -I../generic -I/usr/include/tirpc"; \
             for srcfile in *.c; do \
               echo "attempting to use $(which make) to compile ${srcfile} in ${subdir}"; \
               make "$(echo "${srcfile}" | sed "s/\.c/.o/g")" \
-                CFLAGS="-w -Wno-error -Wfatal-errors -I. -I.. -I../generic -I/usr/include/tirpc" || \
+                CFLAGS="-w -Wno-error -Wfatal-errors ${CPPFLAGS}" || \
                 stat -t "${srcfile}"; \
             done; \
             popd; \
