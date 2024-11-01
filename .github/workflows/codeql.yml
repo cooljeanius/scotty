@@ -86,6 +86,7 @@ jobs:
             vcpkg_installed
             **/vcpkg_installed
             /usr/local/share/vcpkg/buildtrees
+            /usr/local/share/vcpkg/packages
           # the final key part needs to be changed if anything in the build
           # process changes that is not already included here
           key: vcpkg-cache-master-${{ hashFiles('.github/workflows/codeql.yml') }}-${{ hashFiles('Makefile') }}-0001
@@ -93,11 +94,12 @@ jobs:
             vcpkg-cache-master-${{ hashFiles('.github/workflows/codeql.yml') }}--0001
             vcpkg-cache-master--${{ hashFiles('Makefile') }}-0001
             vcpkg-cache-master---0001
+            vcpkg-cache-master
 
       - name: Dependencies
         run: |
           sudo apt-get -qq update
-          sudo apt-get -q install tcl-dev tcl8.6-dev libtcl-perl tk-dev \
+          sudo apt-get -qq install tcl-dev tcl8.6-dev libtcl-perl tk-dev \
             tk8.6-dev perl-tk libtk-img libtk-img-dev libtk-filedialog-perl \
             libtk-tablematrix-perl libtirpc-common libtirpc-dev libntirpc-dev \
             mingw-w64 wine wine64 wine64-preloader rpcsvc-proto libsmi2ldbl \
@@ -108,12 +110,14 @@ jobs:
           if test -x /home/linuxbrew/.linuxbrew/bin/brew; then \
             sync && echo "linuxbrew found; attempting to use it..."; \
             eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"; \
-            env | uniq | sort | uniq | grep -v "\*\*\*" | grep -v "PWD\="; \
             if test -z "${HOMEBREW_VERBOSE_USING_DOTS}"; then \
               export HOMEBREW_VERBOSE_USING_DOTS=1; \
             elif test -z "${HOMEBREW_NO_EMOJI}"; then \
               export HOMEBREW_NO_EMOJI=1; \
             fi; \
+            sync && echo "envvars now that brew has inserted some are:"; \
+            env | uniq | sort | uniq | grep -v "\*\*\*" | grep -v "PWD\="; \
+            sync && echo "now for the actual install command with brew..."; \
             time brew install tcl-tk libtirpc sqlite-analyzer; \
           else \
             echo "skipping linuxbrew"; \
