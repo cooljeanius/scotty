@@ -803,7 +803,7 @@ TnmBerDecSequenceEnd(TnmBer *ber, u_char *token, int length)
 	sprintf(ber->error, "sequence %s at byte %ld (%ld bytes missing)",
 		(length > len) ? "underflow" : "overflow",
 		(long)(ber->current - ber->start),
-		(long)((length > len) ? length - len : len - length));
+		(long)((length > len) ? (length - len) : (len - length)));
 	return NULL;
     }
     return ber;
