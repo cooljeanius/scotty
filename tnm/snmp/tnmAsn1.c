@@ -334,8 +334,8 @@ TnmBerWrongValue(TnmBer *ber, u_char tag)
 void
 TnmBerWrongLength(TnmBer *ber, u_char tag, int length)
 {
-    sprintf(ber->error, "invalid length %d for tag 0x%.2x at byte %d", 
-	    length, tag, ber->current - ber->start);
+    sprintf(ber->error, "invalid length %d for tag 0x%.2x at byte %ld", 
+	    length, tag, (long)(ber->current - ber->start));
 }
 
 /*
