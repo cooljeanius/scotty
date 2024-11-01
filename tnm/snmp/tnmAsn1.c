@@ -800,10 +800,10 @@ TnmBerDecSequenceEnd(TnmBer *ber, u_char *token, int length)
 
     len = ber->current - token;
     if (length != len) {
-	sprintf(ber->error, "sequence %s at byte %d (%d bytes missing)",
+	sprintf(ber->error, "sequence %s at byte %ld (%ld bytes missing)",
 		(length > len) ? "underflow" : "overflow",
-		ber->current - ber->start,
-		(length > len) ? length - len : len - length);
+		(long)(ber->current - ber->start),
+		(long)((length > len) ? (length - len) : (len - length)));
 	return NULL;
     }
     return ber;
