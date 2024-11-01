@@ -92,6 +92,7 @@ jobs:
           restore-keys: |
             vcpkg-cache-master-${{ hashFiles('.github/workflows/codeql.yml') }}--0001
             vcpkg-cache-master--${{ hashFiles('Makefile') }}-0001
+            vcpkg-cache-master---0001
 
       - name: Dependencies
         run: |
@@ -108,7 +109,12 @@ jobs:
             sync && echo "linuxbrew found; attempting to use it..."; \
             eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"; \
             env | uniq | sort | uniq | grep -v "\*\*\*" | grep -v "PWD\="; \
-            time brew install --verbose tcl-tk libtirpc sqlite-analyzer; \
+            if test -z "${HOMEBREW_VERBOSE_USING_DOTS}"; then \
+              export HOMEBREW_VERBOSE_USING_DOTS=1; \
+            elif test -z "${HOMEBREW_NO_EMOJI}"; then \
+              export HOMEBREW_NO_EMOJI=1; \
+            fi; \
+            time brew install tcl-tk libtirpc sqlite-analyzer; \
           else \
             echo "skipping linuxbrew"; \
           fi
