@@ -359,11 +359,11 @@ void
 TnmBerWrongTag(TnmBer *ber, u_char tag, u_char expected)
 {
     if (expected) {
-	sprintf(ber->error, "invalid tag 0x%.2x at byte %d (expected 0x%.2x)",
-		tag, ber->current - ber->start, expected);
+	sprintf(ber->error, "invalid tag 0x%.2x at byte %ld (expected 0x%.2x)",
+		tag, (long)(ber->current - ber->start), expected);
     } else {
-	sprintf(ber->error, "invalid tag 0x%.2x at byte %d", tag,
-		ber->current - ber->start);
+	sprintf(ber->error, "invalid tag 0x%.2x at byte %ld", tag,
+		(long)(ber->current - ber->start));
     }
 }
 
