@@ -14,7 +14,9 @@ jobs:
         # 'sudo' was not transformed because there is no suitable equivalent in
         # GitHub Actions
       - run: if [[ "${{ runner.os }}" == "macOS" ]]; then brew update; elif [[ "${{ runner.os }}" == "Linux" ]]; then sudo apt-get update; fi
-      - run: if [[ "${{ runner.os }}" == "macOS" ]]; then brew install autoconf pkg-config findutils tcl-tk libtirpc rpcsvc-proto; elif [[ "${{ runner.os }}" == "Linux" ]]; then sudo apt-get install tcl libtcl-perl pkg-config findutils libtirpc-common libtirpc-dev libntirpc-dev mingw-w64 wine wine64 rpcsvc-proto libc-dev; fi
+        # Be careful here: libtirpc is listed on Homebrew's package list, but
+        # it's only available via Linuxbrew...
+      - run: if [[ "${{ runner.os }}" == "macOS" ]]; then brew install autoconf pkg-config findutils tcl-tk rpcsvc-proto; elif [[ "${{ runner.os }}" == "Linux" ]]; then sudo apt-get install tcl libtcl-perl pkg-config findutils libtirpc-common libtirpc-dev libntirpc-dev mingw-w64 wine wine64 rpcsvc-proto libc-dev; fi
       - run: if [[ "${{ runner.os }}" == "macOS" ]]; then brew link --force --overwrite tcl-tk; elif [[ "${{ runner.os }}" == "Linux" ]]; then find . -name arpa/nameser.h; fi
       - run: if test -x /home/linuxbrew/.linuxbrew/bin/brew; then eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" && brew install --verbose tcl-tk libtirpc; fi
       - run: cd tnm && autoreconf -vi
