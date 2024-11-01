@@ -91,27 +91,27 @@ jobs:
             libnetsnmptrapd40 libntirpc3.5 libsnmp-perl smistrip
           if test -x /home/linuxbrew/.linuxbrew/bin/brew; then \
             eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"; \
-            brew install --verbose tcl-tk libtirpc sqlite-analyzer; \
+            time brew install --verbose tcl-tk libtirpc sqlite-analyzer; \
           fi
           if test -x "$(which gem)"; then \
-            echo "using $(which gem) to install some things..."; \
+            sync && echo "using $(which gem) to install some things..."; \
             sudo gem install tcl-msgcat tcl-ruby; \
           fi
           if test -x "$(which npm)"; then \
-            echo "using $(which npm) to install some things..."; \
-            npm install tcl tcl-js; \
+            sync && echo "using $(which npm) to install some things..."; \
+            time npm install tcl tcl-js; \
           fi
           if test -x "$(which conda)"; then \
-            echo "using $(which conda) to install something..."; \
-            conda -v install r-tcltk2; \
+            sync && echo "using $(which conda) to install something..."; \
+            time conda -v install r-tcltk2; \
           fi
           if test -x "$(which vcpkg)"; then \
-            echo "giving $(which vcpkg) a try..."; \
-            vcpkg install tcl; \
+            sync && echo "giving $(which vcpkg) a try..."; \
+            time vcpkg install tcl; \
           fi
           if test -x "$(which yarn)"; then \
-            echo "using $(which yarn) to install some things..."; \
-            yarn add tcl tcl-js; \
+            sync && echo "using $(which yarn) to install some things..."; \
+            time yarn add tcl tcl-js; \
           fi
           if test -x "$(which cpan)"; then \
             echo "using $(which cpan) to install some things..."; \
@@ -129,6 +129,8 @@ jobs:
             make ubuntu CFLAGS="-Wno-error -I/usr/include/tirpc -fPIC"; \
           elif [[ "${{ runner.os }}" == "macOS" ]]; then \
             make macosx CFLAGS="-Wno-error"; \
+          else \
+            echo "Warning: unhandled runner.os '${{ runner.os }}'"; \
           fi
           if test -d /usr/include/tirpc; then \
             make -ki build CFLAGS="-Wno-error -I/usr/include/tirpc -fPIC"; \
@@ -146,7 +148,8 @@ jobs:
             pushd "${subdir}"; \
             for srcfile in *.c; do \
               echo "attempting to use $(which make) to compile ${srcfile} in ${subdir}"; \
-              make "$(echo "${srcfile}" | sed "s/\.c/.o/g")" CFLAGS="-w -Wno-error -Wfatal-errors -I. -I.. -I../generic -I/usr/include/tirpc" || \
+              make "$(echo "${srcfile}" | sed "s/\.c/.o/g")" \
+                CFLAGS="-w -Wno-error -Wfatal-errors -I. -I.. -I../generic -I/usr/include/tirpc" || \
                 stat -t "${srcfile}"; \
             done; \
             popd; \
