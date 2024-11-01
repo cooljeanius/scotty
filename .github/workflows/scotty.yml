@@ -38,7 +38,7 @@ jobs:
           if [[ "${{ runner.os }}" == "macOS" ]]; then \
             brew link --force --overwrite tcl-tk; \
           elif [[ "${{ runner.os }}" == "Linux" ]]; then \
-            find . -name arpa/nameser.h; fi
+            sync && find . -name arpa/nameser.h; fi
       - name: Dependencies 4
         run: |
           sync && pwd
@@ -47,6 +47,7 @@ jobs:
             brew install --verbose tcl-tk libtirpc; \
           else \
             echo "Linuxbrew unavailable, so skipping attempting to use it to try to install anything"; \
+            sync && sleep 1; \
           fi
       - run: cd tnm && autoreconf -vi -Wno-obsolete
       - name: Configure
@@ -80,8 +81,9 @@ jobs:
             make CFLAGS="-Wno-error=implicit-function-declaration -Wno-error=incompatible-function-pointer-types -Wno-attributes"; \
           fi
       - name: Install 1
+        shell: bash
         run: |
-          cd tnm
+          pushd tnm
           if [[ $(uname -s) == "Linux" ]]; then \
             if test -e miniconda_build.txt; then \
               sudo make -ki install; \
@@ -89,16 +91,19 @@ jobs:
               sudo make install CFLAGS="-Wno-error"; \
             fi; \
           else \
-            echo "Skipping first install step for '$(uname -s)'"; \
+            sync && echo "Skipping first install step for '$(uname -s)'"; \
           fi
+          popd
       - name: Install 2
+        shell: bash
         run: |
-          cd tnm
+          pushd tnm
           if [[ $(uname -s) == "Linux" ]]; then \
             sudo make sinstall; \
           else \
-            echo "Skipping second install step for '$(uname -s)'"; \
+            sync && echo "Skipping second install step for '$(uname -s)'"; \
           fi
+          popd
       - name: Debug failure
         if: "${{ failure() }}"
         run: |
