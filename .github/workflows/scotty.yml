@@ -10,7 +10,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         # 'sudo' was not transformed because there is no suitable equivalent in
         # GitHub Actions
       - name: Dependencies 1
