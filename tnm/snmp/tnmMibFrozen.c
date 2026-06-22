@@ -438,10 +438,7 @@ SaveNode(TnmMibNode *nodePtr, int *i, FILE *fp)
  */
 
 static void
-SaveData(fp, numEnums, numTCs, numNodes, nodePtr)
-    FILE *fp;
-    int numEnums, numTCs, numNodes;
-    TnmMibNode *nodePtr;
+SaveData(FILE *fp, int numEnums, int numTCs, int numNodes, TnmMibNode *nodePtr)
 {
     TnmMibNode *nPtr;
     TnmMibRest *ePtr;

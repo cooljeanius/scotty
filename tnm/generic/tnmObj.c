@@ -14,8 +14,8 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+# include <config.h>
+#endif /* HAVE_CONFIG_H */
 
 #include "tnmInt.h"
 
@@ -40,7 +40,7 @@ TnmGetTAddrFromObj
  * Prototypes for procedures defined later in this file:
  */
 
-static void		
+static void
 FreeUnsigned64InternalRep	(Tcl_Obj *objPtr);
 
 static void
@@ -61,7 +61,7 @@ UpdateStringOfUnsigned32	(Tcl_Obj *objPtr);
 static int
 SetUnsigned32FromAny		(Tcl_Interp *interp,
 					     Tcl_Obj *objPtr);
-static void		
+static void
 FreeOctetStringInternalRep	(Tcl_Obj *objPtr);
 
 static void
@@ -160,7 +160,7 @@ TnmNewUnsigned64Obj(TnmUnsigned64 u)
 
     uPtr = (TnmUnsigned64 *) Tcl_Alloc(sizeof(TnmUnsigned64));
     memcpy((char *) uPtr, (char *) &u, sizeof(TnmUnsigned64));
-    
+
     objPtr->internalRep.otherValuePtr = (VOID *) uPtr;
     objPtr->typePtr = &tnmUnsigned64Type;
     Tcl_InvalidateStringRep(objPtr);
@@ -179,7 +179,7 @@ TnmNewUnsigned64Obj(TnmUnsigned64 u)
  *
  * Side effects:
  *	The object's old string rep, if any, is freed. Also, any old
- *	internal rep is freed.  
+ *	internal rep is freed.
  *
  *----------------------------------------------------------------------
  */
@@ -201,7 +201,7 @@ TnmSetUnsigned64Obj(Tcl_Obj *objPtr, TnmUnsigned64 u)
 
     uPtr = (TnmUnsigned64 *) Tcl_Alloc(sizeof(TnmUnsigned64));
     memcpy((char *) uPtr, (char *) &u, sizeof(TnmUnsigned64));
-    
+
     objPtr->internalRep.otherValuePtr = (VOID *) uPtr;
     objPtr->typePtr = &tnmUnsigned64Type;
 }
@@ -221,7 +221,7 @@ TnmSetUnsigned64Obj(Tcl_Obj *objPtr, TnmUnsigned64 u)
  *	the interpreter, if interp is not NULL.
  *
  * Side effects:
- *	If the object is not already an tnmUnsigned64Type, the conversion 
+ *	If the object is not already an tnmUnsigned64Type, the conversion
  *	will free any old internal representation.
  *
  *----------------------------------------------------------------------
@@ -261,8 +261,9 @@ TnmGetUnsigned64FromObj(Tcl_Interp *interp, Tcl_Obj *objPtr, TnmUnsigned64 *uPtr
  */
 
 static void
-FreeUnsigned64InternalRep(objPtr)
-    Tcl_Obj *objPtr;		/* Object with internal rep to free. */
+FreeUnsigned64InternalRep (
+    Tcl_Obj *objPtr		/* Object with internal rep to free. */
+)
 {
     if (objPtr->internalRep.otherValuePtr) {
 	Tcl_Free((char *) objPtr->internalRep.otherValuePtr);
@@ -294,7 +295,7 @@ DupUnsigned64InternalRep(srcPtr, copyPtr)
 {
     copyPtr->internalRep.otherValuePtr
 	= (VOID *) Tcl_Alloc(sizeof(TnmUnsigned64));
-    memcpy((char *) copyPtr->internalRep.otherValuePtr, 
+    memcpy((char *) copyPtr->internalRep.otherValuePtr,
 	   (char *) srcPtr->internalRep.otherValuePtr, sizeof(TnmUnsigned64));
     copyPtr->typePtr = &tnmUnsigned64Type;
 }
@@ -371,7 +372,7 @@ SetUnsigned64FromAny(interp, objPtr)
     if (*p == '-') {
 	goto badUnsigned64;
     }
-    
+
     /* XXX use strtoull() where available! */
     if (sscanf(p, "%llu", &u) != 1) {
     badUnsigned64:
@@ -380,7 +381,7 @@ SetUnsigned64FromAny(interp, objPtr)
 	     * Must copy string before resetting the result in case a caller
 	     * is trying to convert the interpreter's result to an int.
 	     */
-	    
+
 	    char buf[100];
 	    sprintf(buf, "expected 64 bit unsigned but got \"%.50s\"", string);
 	    Tcl_ResetResult(interp);
@@ -403,7 +404,7 @@ SetUnsigned64FromAny(interp, objPtr)
     *(TnmUnsigned64 *) objPtr->internalRep.otherValuePtr = u;
     objPtr->typePtr = &tnmUnsigned64Type;
     return TCL_OK;
-}    
+}
 
 /*
  *----------------------------------------------------------------------
@@ -447,7 +448,7 @@ TnmNewUnsigned32Obj(TnmUnsigned32 u)
  *
  * Side effects:
  *	The object's old string rep, if any, is freed. Also, any old
- *	internal rep is freed.  
+ *	internal rep is freed.
  *
  *----------------------------------------------------------------------
  */
@@ -485,7 +486,7 @@ TnmSetUnsigned32Obj(Tcl_Obj *objPtr, TnmUnsigned32 u)
  *	the interpreter, if interp is not NULL.
  *
  * Side effects:
- *	If the object is not already an tnmUnsigned32Type, the conversion 
+ *	If the object is not already an tnmUnsigned32Type, the conversion
  *	will free any old internal representation.
  *
  *----------------------------------------------------------------------
@@ -606,7 +607,7 @@ SetUnsigned32FromAny(interp, objPtr)
     if (*p == '-') {
 	goto badUnsigned32;
     }
-    
+
     errno = 0;
     u = strtoul(p, &end, 0);
     if (end == string) {
@@ -616,7 +617,7 @@ SetUnsigned32FromAny(interp, objPtr)
 	     * Must copy string before resetting the result in case a caller
 	     * is trying to convert the interpreter's result to an int.
 	     */
-	    
+
 	    char buf[100];
 	    sprintf(buf, "expected 32 bit unsigned but got \"%.50s\"", string);
 	    Tcl_ResetResult(interp);
@@ -633,11 +634,11 @@ SetUnsigned32FromAny(interp, objPtr)
 	}
 	return TCL_ERROR;
     }
-    
+
     /*
      * Make sure that the string has no garbage after the end of the int.
      */
-    
+
     while ((end < (string+length)) && isspace(*end)) {
 	end++;
     }
@@ -658,7 +659,7 @@ SetUnsigned32FromAny(interp, objPtr)
     objPtr->internalRep.longValue = (long) u;
     objPtr->typePtr = &tnmUnsigned32Type;
     return TCL_OK;
-}    
+}
 
 /*
  *----------------------------------------------------------------------
@@ -699,7 +700,7 @@ TnmNewOctetStringObj(char *bytes, int length)
  *
  * Side effects:
  *	The object's old string rep, if any, is freed. Also, any old
- *	internal rep is freed.  
+ *	internal rep is freed.
  *
  *----------------------------------------------------------------------
  */
@@ -740,7 +741,7 @@ TnmSetOctetStringObj(Tcl_Obj *objPtr, char *bytes, int length)
  *	the interpreter, if interp is not NULL.
  *
  * Side effects:
- *	If the object is not already an tnmOctetStringType, the conversion 
+ *	If the object is not already an tnmOctetStringType, the conversion
  *	will free any old internal representation.
  *
  *----------------------------------------------------------------------
@@ -814,10 +815,10 @@ DupOctetStringInternalRep(srcPtr, copyPtr)
 {
     size_t size = (int) srcPtr->internalRep.twoPtrValue.ptr2;
     char *bytes;
-    
+
     bytes = Tcl_Alloc(size);
     memcpy(bytes, (char *) srcPtr->internalRep.twoPtrValue.ptr1, size);
-    
+
     copyPtr->internalRep.twoPtrValue.ptr1 = (VOID *) bytes;
     copyPtr->internalRep.twoPtrValue.ptr2 = (VOID *) size;
     copyPtr->typePtr = &tnmOctetStringType;
@@ -896,7 +897,7 @@ SetOctetStringFromAny(interp, objPtr)
 	     * Must copy string before resetting the result in case a caller
 	     * is trying to convert the interpreter's result to an int.
 	     */
-	    
+
 	    char *tmp = ckstrdup(string);
 	    Tcl_ResetResult(interp);
 	    Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
@@ -907,7 +908,7 @@ SetOctetStringFromAny(interp, objPtr)
 	Tcl_Free(bytes);
 	return TCL_ERROR;
     }
-    
+
     /*
      * Free the old internalRep before setting the new one. We do this as
      * late as possible to allow the conversion code, in particular
@@ -922,7 +923,7 @@ SetOctetStringFromAny(interp, objPtr)
     objPtr->internalRep.twoPtrValue.ptr2 = (VOID *) length;
     objPtr->typePtr = &tnmOctetStringType;
     return TCL_OK;
-}    
+}
 
 /*
  *----------------------------------------------------------------------
@@ -963,7 +964,7 @@ TnmNewIpAddressObj(struct in_addr *ipaddr)
  *
  * Side effects:
  *	The object's old string rep, if any, is freed. Also, any old
- *	internal rep is freed.  
+ *	internal rep is freed.
  *
  *----------------------------------------------------------------------
  */
@@ -1001,7 +1002,7 @@ TnmSetIpAddressObj(Tcl_Obj *objPtr, struct in_addr *ipaddr)
  *	the interpreter, if interp is not NULL.
  *
  * Side effects:
- *	If the object is not already an tnmIpAddressType, the conversion 
+ *	If the object is not already an tnmIpAddressType, the conversion
  *	will free any old internal representation.
  *
  *----------------------------------------------------------------------
@@ -1068,7 +1069,7 @@ static void
 UpdateStringOfIpAddress(Tcl_Obj *objPtr)
 {
     struct in_addr *ipaddrPtr;
-    
+
     ipaddrPtr = (struct in_addr *) &objPtr->internalRep.longValue;
     objPtr->bytes = Tcl_Alloc(16);
     strcpy(objPtr->bytes, inet_ntoa(*ipaddrPtr));
@@ -1118,7 +1119,7 @@ SetIpAddressFromAny(interp, objPtr)
     if (TnmSetIPAddress(interp, string, &inaddr) != TCL_OK) {
 	return TCL_ERROR;
     }
-    
+
     /*
      * Free the old internalRep before setting the new one. We do this as
      * late as possible to allow the conversion code, in particular
@@ -1132,6 +1133,6 @@ SetIpAddressFromAny(interp, objPtr)
     objPtr->internalRep.longValue = * (long *) &inaddr.sin_addr;
     objPtr->typePtr = &tnmIpAddressType;
     return TCL_OK;
-}    
+}
 
 
