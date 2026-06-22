@@ -16,8 +16,8 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+# include <config.h>
+#endif /* HAVE_CONFIG_H */
 
 #include "tnmInt.h"
 #include "tnmPort.h"
@@ -321,7 +321,7 @@ InedInitialize(Tcl_Interp *interp)
  */
 
 static void
-InedFatal()
+InedFatal(void)
 {
     TnmWriteMessage("Tnm: lost connection to Tkined\n");
     Tcl_Exit(1);

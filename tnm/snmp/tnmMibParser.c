@@ -1,8 +1,8 @@
 /*
  * tnmMibParser.c --
  *
- *	Functions to parse MIB files for creating a MIB tree. The 
- *	structure of MIB information must meet the definitions specified 
+ *	Functions to parse MIB files for creating a MIB tree. The
+ *	structure of MIB information must meet the definitions specified
  *	in RFC 1155, RFC 1212, RFC 1215, RFC 2578, RFC 2579, RFC 2580.
  *	This code is partly derived from the MIB parser of the CMU
  *	SNMP implementation, but it now looks quite different as we
@@ -20,8 +20,8 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+# include <config.h>
+#endif /* HAVE_CONFIG_H */
 
 #include "tnmSnmp.h"
 #include "tnmMib.h"
@@ -71,11 +71,11 @@
 
 #define STATUS		100
 #define MANDATORY	101
- 
+
 #ifdef OPTIONAL
 #undef OPTIONAL
 #endif
- 
+
 #define OPTIONAL	102
 #define OBSOLETE	103
 #define CURRENT		104
@@ -274,7 +274,7 @@ static Keyword *hashtab[HASHTAB_SIZE];
  */
 
 static void
-AddNewNode		(TnmMibNode **nodeList, char *label, 
+AddNewNode		(TnmMibNode **nodeList, char *label,
 				     char *parentName, u_int subid);
 static TnmMibRest*
 ScanIntEnums		(char *str);
@@ -304,10 +304,10 @@ static int
 ParseASN1Type		(FILE *fp, char *keyword);
 
 static TnmMibNode*
-ParseModuleCompliance	(FILE *fp, char *name, 
+ParseModuleCompliance	(FILE *fp, char *name,
 				     TnmMibNode **nodeList);
 static TnmMibNode*
-ParseModuleIdentity	(FILE *fp, char *name, 
+ParseModuleIdentity	(FILE *fp, char *name,
 				     TnmMibNode **nodeList);
 static TnmMibNode*
 ParseNotificationType	(FILE *fp, char *name,
@@ -319,7 +319,7 @@ static TnmMibNode*
 ParseCapabilitiesType	(FILE *fp, char *name,
 				     TnmMibNode **nodeList);
 static TnmMibNode*
-ParseTrapType		(FILE *fp, char *name, 
+ParseTrapType		(FILE *fp, char *name,
 				     TnmMibNode **nodeList);
 static TnmMibNode*
 ParseObjectGroup	(FILE *fp, char *name,
@@ -363,8 +363,8 @@ AddNewNode(TnmMibNode **nodeList, char *label, char *parentName, u_int subid)
 }
 
 /*
- * TnmMibParse() opens a MIB file specified by file and returns a 
- * tree of objects in that MIB. The function returns a pointer to 
+ * TnmMibParse() opens a MIB file specified by file and returns a
+ * tree of objects in that MIB. The function returns a pointer to
  * the "root" of the MIB, or NULL if an error occurred.
  */
 
@@ -425,7 +425,7 @@ TnmMibParse(char *file, char *frozen)
     } else if (tnmMibTypeList != tnmMibTypeSaveMark) {
 	return tnmMibTypeList->moduleName;
     }
-    
+
     return NULL;
 }
 
@@ -490,13 +490,13 @@ ScanRange (char *str)
 {
     TnmMibRest *rangeList = NULL;
     int base = 0;
-    
+
     if (! str) return NULL;
 
     if (strncmp (str, "R ", 2) != 0) return NULL;
 
     str += 2;
-    
+
     while (*str) {
 	char *end, *start = str;
 	TnmMibRest *newSubRange = NULL,
@@ -508,12 +508,12 @@ ScanRange (char *str)
 	while (*str && isspace(*str))
 	    str++;
 	start = str;
-	
+
 	while (*str && (*str != '.' ) && !isspace(*str))
 	    str++;
 	if (*str)
 	    *str++ = 0;
-	
+
 	if ( *str == '.' ) {
 	    str++;
 	    end = str;
@@ -540,7 +540,7 @@ ScanRange (char *str)
  	newSubRange->nextPtr = NULL;
 
 	while (((*currRangePtr) != NULL) &&
-	       (newSubRange->rest.intRange.max 
+	       (newSubRange->rest.intRange.max
 		> (*currRangePtr)->rest.intRange.min)) {
 	    prevRangePtr = currRangePtr;
 	    currRangePtr = &(*currRangePtr)->nextPtr;
@@ -564,7 +564,7 @@ CreateType(char *name, int syntax, char *displayHint, char *enums)
 
     typePtr = (TnmMibType *) ckalloc(sizeof(TnmMibType));
     memset((char *) typePtr, 0, sizeof(TnmMibType));
-    
+
     if (name) {
 	typePtr->name = ckstrdup(name);
     }
@@ -591,14 +591,14 @@ CreateType(char *name, int syntax, char *displayHint, char *enums)
 	    typePtr->restKind = TNM_MIB_REST_NONE;
 	}
     }
-    
+
     return TnmMibAddType(typePtr);
 }
 
 
 /*
- * ReadIntEnums() scans a enum description, like 
- * ``INTEGER { foo(1), bar(2) }'', with the next token to be read 
+ * ReadIntEnums() scans a enum description, like
+ * ``INTEGER { foo(1), bar(2) }'', with the next token to be read
  * the one after the ``{''; upon return the closing ``}'' is read.
  * the scanned enums are return in the passed dstring, in the form:
  * ``D foo 3 bar 4''
@@ -612,10 +612,10 @@ ReadIntEnums(FILE *fp, char **strPtr)
     int fail = 0;		/* parser thinks anything as alright */
 
     Tcl_DStringInit(&result);
-    
+
     /* mark we append Descriptions: */
     Tcl_DStringAppend(&result, "D", 1);
-    
+
     /* got LEFTBRACKET:  ``{'' */
     do {
 	char str [SYMBOL_MAXLEN];
@@ -646,9 +646,9 @@ ReadIntEnums(FILE *fp, char **strPtr)
         syntax = ReadKeyword(fp, keyword);
 
     } while (syntax == COMMA);
-    
+
     /* the list is scanned, now there must be a ``}'' */
-    
+
     if (fail || syntax != RIGHTBRACKET) {
 	fprintf(stderr, "%s:%d: Warning: can not scan enums - ignored\n",
 		tnmMibFileName, line);
@@ -662,8 +662,8 @@ ReadIntEnums(FILE *fp, char **strPtr)
 
 
 /*
- * ReadRange() scans a sub-range description, like 
- * ``INTEGER (1..10|15|20..30)'', with the next token to be read 
+ * ReadRange() scans a sub-range description, like
+ * ``INTEGER (1..10|15|20..30)'', with the next token to be read
  * the one after the ``(''; upon return the closing ``)'' is read.
  * the scanned sub-ranges are return in the passed dstring, in the form:
  * ``R 1..10 15 20..30''
@@ -682,10 +682,10 @@ ReadRange(FILE *fp, char **strPtr)
     char keyword [SYMBOL_MAXLEN];
 
     Tcl_DStringInit(&result);
-    
+
     /* mark we append Ranges: */
     Tcl_DStringAppend(&result, "R", 1);
-    
+
     /* got LEFTPAREN:  ``('' */
     do {
 	syntax = ReadKeyword(fp, value);
@@ -713,7 +713,7 @@ ReadRange(FILE *fp, char **strPtr)
 	if (syntax == UPTO) {
 	    /* ``( 1..'' */
 	    syntax = ReadKeyword(fp, value);
-	    
+
 	    switch (syntax) {
 	    case NUMBER:
 	    case SIGNEDNUMBER:
@@ -748,14 +748,14 @@ ReadRange(FILE *fp, char **strPtr)
     out:
 	; /* syntactic sugar */
     } while (syntax == OR);
-    
+
     /* the list is scanned, now there must be a ``)'' */
-    
+
     if (fail || syntax != RIGHTPAREN) {
 	fprintf(stderr, "%s:%d: Warning: can not scan range - ignored\n",
 		tnmMibFileName, line);
     }
-    
+
     *strPtr = ckstrdup(Tcl_DStringValue(&result));
     Tcl_DStringFree(&result);
 
@@ -773,7 +773,7 @@ ReadNameList(FILE *fp)
     Tcl_DString dst;
     char keyword[SYMBOL_MAXLEN];
     char *result;
-    
+
     if ((syntax = ReadKeyword(fp, keyword)) != LEFTBRACKET) {
 	return NULL;
     }
@@ -791,10 +791,10 @@ ReadNameList(FILE *fp)
 	    return NULL;
 	}
     }
-    
+
     result = ckstrdup(Tcl_DStringValue(&dst));
     Tcl_DStringFree(&dst);
-    
+
     return result;
 }
 
@@ -817,7 +817,7 @@ ParseFile (FILE *fp)
     TnmMibNode *nodeList = NULL;
     TnmMibNode *lastOTPtr = NULL;
 
-    /* 
+    /*
      * this is really a klude: try to fetch type-definitions
      * like: ``Boolean ::= INTEGER { true(1), false(2) }''
      * and: ``KBytes ::= INTEGER''.
@@ -826,20 +826,20 @@ ParseFile (FILE *fp)
     char tt_name[SYMBOL_MAXLEN];
     TnmMibType *typePtr = NULL;
     /*
-     * init hashtable and parse mib 
+     * init hashtable and parse mib
      */
 
     HashKeywords();
     line = 1;
 
     while ((syntax = ReadKeyword(fp, keyword)) != EOF) {
-	
+
 	if (state == OUT_OF_MIB) {
 
 	    /*
 	     * we are at the beginning of a mib
 	     */
-	
+
 	    switch (syntax) {
 	      case DEFINITIONS:
 		state = IN_MIB;
@@ -855,11 +855,11 @@ ParseFile (FILE *fp)
 
 		break;
 	      case END:
-		fprintf(stderr, "%s: end before start of MIB.\n", 
+		fprintf(stderr, "%s: end before start of MIB.\n",
 			tnmMibFileName);
 		return NULL;
 	      case ERROR:
-		fprintf(stderr, "%s:%d: error in MIB\n", 
+		fprintf(stderr, "%s:%d: error in MIB\n",
 			tnmMibFileName, line);
 		return NULL;
 	      case LABEL:
@@ -880,7 +880,7 @@ ParseFile (FILE *fp)
 	        }
 		break;
 	      default:
-		fprintf(stderr, "%s:%d: %s is a reserved word\n", 
+		fprintf(stderr, "%s:%d: %s is a reserved word\n",
 			tnmMibFileName, line, keyword);
 		return NULL;
 	    }
@@ -890,7 +890,7 @@ ParseFile (FILE *fp)
 	    /*
 	     * we are in a mib
 	     */
-	
+
 	    switch (syntax) {
 	      case DEFINITIONS:
 		fprintf(stderr, "%s: Fatal: nested MIBS\n", tnmMibFileName);
@@ -912,9 +912,9 @@ ParseFile (FILE *fp)
 		 * private MIBs out there that use these types.
 		 * Suggested by David Keeney <keeney@zk3.dec.com>.
 		 */
-	
+
 		if (syntax == ASN1_INTEGER
-		    || syntax == ASN1_OCTET_STRING 
+		    || syntax == ASN1_OCTET_STRING
 		    || syntax == ASN1_OBJECT_IDENTIFIER
 		    || syntax == ASN1_IPADDRESS
 		    || syntax == ASN1_COUNTER32
@@ -928,16 +928,16 @@ ParseFile (FILE *fp)
 		     * (wanted) and then in rfc1213.mib (unwanted))
 		     * ignore and use the existing one (but this may
 		     * hurt -- you have been warned) */
-		      
+
 		      typePtr = CreateType(tt_name, syntax, 0, 0);
 		      typePtr->macro = TNM_MIB_TYPE_ASSIGNMENT;
-		  } else if (syntax == ASN1_SEQUENCE 
+		  } else if (syntax == ASN1_SEQUENCE
 			     && lastOTPtr && lastOTPtr->syntax == LABEL) {
 		      lastOTPtr->syntax = syntax;
 		  }
 		break;
 	      case ERROR:
-		fprintf(stderr, "%s:%d: error in MIB\n", 
+		fprintf(stderr, "%s:%d: error in MIB\n",
 			tnmMibFileName, line);
 		return NULL;
 	      case LABEL:
@@ -1000,7 +1000,7 @@ ParseFile (FILE *fp)
 	      case CAPABILITIES:
 		nodePtr = ParseCapabilitiesType(fp, name, &nodeList);
 		if (nodePtr == NULL) {
-		    fprintf(stderr, 
+		    fprintf(stderr,
 			    "%s:%d: bad format in AGENT-CAPABILITIES\n",
 			    tnmMibFileName, line);
                     return NULL;
@@ -1077,10 +1077,10 @@ ParseFile (FILE *fp)
 		/* save for SEQUENCE hack: */
 		lastOTPtr = nodePtr;
 		break;
-		
-		/* 
+
+		/*
 		 * expect a leftparen; eg. for ``MacAddress ::= OCTET
-		 * STRING (SIZE (6))''; action is to skip over. 
+		 * STRING (SIZE (6))''; action is to skip over.
 		 */
 	      case LEFTPAREN:
 #ifdef USE_RANGES
@@ -1129,7 +1129,7 @@ ParseFile (FILE *fp)
 #endif
 
 	      case LEFTBRACKET:
-		{ 
+		{
 		    char *enums;
 		    if (ReadIntEnums(fp, &enums) != RIGHTBRACKET) {
 			fprintf(stderr, "%s:%d: bad mib format\n",
@@ -1143,13 +1143,13 @@ ParseFile (FILE *fp)
 		break;
 
 	      default:
-		fprintf(stderr, "%s:%d: bad mib format\n", 
+		fprintf(stderr, "%s:%d: bad mib format\n",
 			tnmMibFileName, line);
 		return NULL;
 	    }
 	}
     }
-    
+
     /*
      * check if we finished correctly
      */
@@ -1176,7 +1176,7 @@ ParseHeader (FILE *fp, char *keyword)
     int syntax;
 
     tnmMibModuleName = ckstrdup(keyword);
-   
+
     if ((syntax = ReadKeyword(fp, keyword)) != EQUALS) {
 	return ERROR;
     }
@@ -1198,7 +1198,7 @@ ParseHeader (FILE *fp, char *keyword)
 	syntax = ReadKeyword(fp, keyword);
     }
 
-    
+
     /*
      * if it's IMPORTS clause, read the next keyword after SEMICOLON
      */
@@ -1215,19 +1215,19 @@ ParseHeader (FILE *fp, char *keyword)
 		{
 		    int i, objc, code;
 		    Tcl_Obj **objv;
-		    
+
 		    code = Tcl_ListObjGetElements(NULL, tnmMibModulesLoaded,
 						  &objc, &objv);
 		    if (code != TCL_OK) {
 			Tcl_Panic("currupted internal list tnmMibModulesLoaded");
 		    }
-    
+
 		    for (i = 0; i < objc; i++) {
 			char *s = Tcl_GetStringFromObj(objv[i], NULL);
 			if (strcmp(keyword, s) == 0) {
 			    i = -1;
 			    break;
-			}	
+			}
 		    }
 		    if (i != -1) {
 			fprintf(stderr, "unknown module %s imported from %s\n",
@@ -1260,7 +1260,7 @@ ParseHeader (FILE *fp, char *keyword)
 
 /*
  * Parses an ASN1 syntax and places the LABEL that follows in the
- * string pointed to by keyword. Returns 0 on error, LABEL on success.  
+ * string pointed to by keyword. Returns 0 on error, LABEL on success.
  */
 
 static int
@@ -1275,10 +1275,10 @@ ParseASN1Type (FILE *fp, char *keyword)
     char convention [SYMBOL_MAXLEN];
     char *displayHint = NULL;
     char *enums = NULL;
-    
+
     /* save passed name: */
     strcpy (name, keyword);
-    
+
     syntax = ReadKeyword(fp, keyword);
 
     /*
@@ -1298,7 +1298,7 @@ ParseASN1Type (FILE *fp, char *keyword)
     case ASN1_TIMETICKS:    /* KEENEY - 11/7/95 */
     case ASN1_OPAQUE:       /* KEENEY - 11/7/95 */
     case ASN1_COUNTER64:    /* KEENEY - 11/7/95 */
-	
+
 	break;
     case ASN1_SEQUENCE:
 	while ((syntax = ReadKeyword(fp, keyword)) != RIGHTBRACKET)
@@ -1306,10 +1306,10 @@ ParseASN1Type (FILE *fp, char *keyword)
 	syntax = ASN1_SEQUENCE;
 	break;
     case TEXTUALCONV:
-	
+
 	/* default: no convention/enums seen: */
 	convention [0] = 0;
-	
+
 	while ((syntax = ReadKeyword(fp, keyword)) != SYNTAX
 	       && syntax != DISPLAYHINT) {
 	    switch (syntax) {
@@ -1317,7 +1317,7 @@ ParseASN1Type (FILE *fp, char *keyword)
 		syntax = ReadKeyword(fp, keyword);
 		if (syntax != CURRENT
 		    && syntax != OBSOLETE && syntax != DEPRECATED) {
-		    fprintf(stderr, "%s:%d: scan error near `%s'\n", 
+		    fprintf(stderr, "%s:%d: scan error near `%s'\n",
 			    tnmMibFileName, line, keyword);
 		    return 0;
 		}
@@ -1333,11 +1333,11 @@ ParseASN1Type (FILE *fp, char *keyword)
 		return 0;
 	    }
 	}
-	
+
 	/*
 	 * read the keyword following SYNTAX or DISPLAYHINT
 	 */
-	
+
 	merk = ReadKeyword(fp, keyword);
 	/* ugh. and yet another ugly hack to this ugly parser... */
 	if (syntax == SYNTAX && merk == LABEL)
@@ -1355,12 +1355,12 @@ ParseASN1Type (FILE *fp, char *keyword)
 	    /* alas, we are (hopefully) done. */
 	    return 0;
 	}
-	
+
 	if (syntax == DISPLAYHINT)
 	{
 	    /* save convention */
 	    strcpy (convention, keyword);
-	    
+
 	    /* skip to SYNTAX: */
 	    while ((syntax = ReadKeyword(fp, keyword)) != SYNTAX) {
 		switch (syntax) {
@@ -1368,7 +1368,7 @@ ParseASN1Type (FILE *fp, char *keyword)
 		    syntax = ReadKeyword(fp, keyword);
 		    if (syntax != CURRENT
 			&& syntax != OBSOLETE && syntax != DEPRECATED) {
-			fprintf(stderr, "%s:%d: scan error near `%s'\n", 
+			fprintf(stderr, "%s:%d: scan error near `%s'\n",
 				tnmMibFileName, line, keyword);
 			return 0;
 		    }
@@ -1384,20 +1384,20 @@ ParseASN1Type (FILE *fp, char *keyword)
 		    return 0;
 		}
 	    }
-	    
+
 	    if ((merk = ReadKeyword(fp, keyword)) == LABEL)
 		return 0;
 	}
-	
+
 	/* XXX */
 	/* save object type: */
 	strcpy (otype, keyword);
  	osyntax = merk;
-	
+
 	/*
 	 * if next keyword is a bracket, we have to continue
 	 */
-	
+
 	if ((syntax = ReadKeyword(fp, keyword)) == LEFTPAREN) {
 #ifdef USE_RANGES
 	    if ((osyntax != ASN1_OCTET_STRING) ||
@@ -1431,13 +1431,13 @@ ParseASN1Type (FILE *fp, char *keyword)
 	    syntax = ReadKeyword(fp, keyword);
 #endif
 	}
-	
+
 	if (syntax == LEFTBRACKET) {
 	    syntax = ReadIntEnums(fp, &enums);
 	}
-	
+
 	/* found MIB_TextConv: */
-	
+
 	if (convention && *convention) {
 	    displayHint = convention;
 	}
@@ -1447,7 +1447,7 @@ ParseASN1Type (FILE *fp, char *keyword)
 	}
 
 	{
-	    TnmMibType *typePtr = CreateType(name, osyntax, 
+	    TnmMibType *typePtr = CreateType(name, osyntax,
 					     displayHint, enums);
 	    typePtr->fileOffset = offset;
 	    typePtr->status = status;
@@ -1457,7 +1457,7 @@ ParseASN1Type (FILE *fp, char *keyword)
 	    ckfree (enums);
 	    enums = NULL;
 	}
-	
+
 	break;
       default:
 	{ TnmMibType *typePtr = TnmMibFindType(keyword);
@@ -1477,7 +1477,7 @@ ParseASN1Type (FILE *fp, char *keyword)
 	  }
         }
     }
-    
+
     return syntax;
 }
 
@@ -1495,11 +1495,11 @@ ParseModuleCompliance (FILE *fp, char *name, TnmMibNode **nodeList)
     TnmMibNode *nodePtr;
 
     nodePtr = TnmMibNewNode(name);
-    
+
     /*
      * read keywords until syntax EQUALS is found
      */
-    
+
     while ((syntax = ReadKeyword(fp, keyword)) != EQUALS) {
 	switch (syntax) {
 	case DESCRIPTION:
@@ -1521,7 +1521,7 @@ ParseModuleCompliance (FILE *fp, char *name, TnmMibNode **nodeList)
     if (ParseNodeList(fp, nodeList, nodePtr) < 0) {
 	return NULL;
     }
-    
+
     return nodePtr;
 }
 
@@ -1536,7 +1536,7 @@ ParseModuleIdentity (FILE *fp, char *name, TnmMibNode **nodeList)
     char keyword[SYMBOL_MAXLEN];
     int	syntax;
     TnmMibNode *nodePtr;
-    
+
     nodePtr = TnmMibNewNode(name);
 
     /*
@@ -1592,7 +1592,7 @@ ParseNotificationType (FILE *fp, char *name, TnmMibNode **nodeList)
 	    syntax = ReadKeyword(fp, keyword);
 	    if (syntax != CURRENT
 		&& syntax != OBSOLETE && syntax != DEPRECATED) {
-		fprintf(stderr, "%s:%d: scan error near `%s'\n", 
+		fprintf(stderr, "%s:%d: scan error near `%s'\n",
 			tnmMibFileName, line, keyword);
 		return NULL;
 	    }
@@ -1617,17 +1617,17 @@ ParseNotificationType (FILE *fp, char *name, TnmMibNode **nodeList)
             break;
 	}
     }
-    
+
     if (ParseNodeList(fp, nodeList, nodePtr) < 0) {
 	return NULL;
     }
-    
+
     return nodePtr;
 }
 
 
 /*
- * ParseCapabilitiesType() parses or better ignores agent 
+ * ParseCapabilitiesType() parses or better ignores agent
  * capabilities macros.
  */
 
@@ -1659,7 +1659,7 @@ ParseCapabilitiesType (FILE *fp, char *name, TnmMibNode **nodeList)
     if (ParseNodeList(fp, nodeList, nodePtr) < 0) {
 	return NULL;
     }
-    
+
     return nodePtr;
 }
 
@@ -1724,7 +1724,7 @@ ParseTrapType (FILE *fp, char *name, TnmMibNode **nodeList)
 	    {
 		TnmMibNode *n;
 		for (n = *nodeList; n; n = n->nextPtr) {
-		    if (n->subid == 0 
+		    if (n->subid == 0
 			&& strcmp(n->parentName, keyword) == 0) break;
 		}
 		if (n) {
@@ -1785,12 +1785,12 @@ ParseObjectGroup (FILE *fp, char *name, TnmMibNode **nodeList)
     /*
      * next keyword must be OBJECTS
      */
-    
+
     if ((syntax = ReadKeyword(fp, keyword)) != OBJECTS)
 	return NULL;
-    
+
     nodePtr = TnmMibNewNode(name);
-    
+
     nodePtr->index = ReadNameList(fp);
     if (! nodePtr->index) {
 	return NULL;
@@ -1799,14 +1799,14 @@ ParseObjectGroup (FILE *fp, char *name, TnmMibNode **nodeList)
     /*
      * read keywords until EQUALS are found
      */
-    
+
     while ((syntax = ReadKeyword(fp, keyword)) != EQUALS) {
 	switch (syntax) {
 	  case STATUS:
 	    syntax = ReadKeyword(fp, keyword);
 	    if (syntax != CURRENT
 		&& syntax != OBSOLETE && syntax != DEPRECATED) {
-		fprintf(stderr, "%s:%d: scan error near `%s'\n", 
+		fprintf(stderr, "%s:%d: scan error near `%s'\n",
 			tnmMibFileName, line, keyword);
 		return NULL;
 	    }
@@ -1825,7 +1825,7 @@ ParseObjectGroup (FILE *fp, char *name, TnmMibNode **nodeList)
 	    break;
 	}
     }
-    
+
     if (ParseNodeList(fp, nodeList, nodePtr) < 0) {
 	return NULL;
     }
@@ -1850,7 +1850,7 @@ ParseNotificationGroup (FILE *fp, char *name, TnmMibNode **nodeList)
     /*
      * next keyword must be NOTIFICATIONS
      */
-    
+
     if ((syntax = ReadKeyword(fp, keyword)) != NOTIFICATIONS) {
 	return NULL;
     }
@@ -1865,14 +1865,14 @@ ParseNotificationGroup (FILE *fp, char *name, TnmMibNode **nodeList)
     /*
      * read keywords until EQUALS are found
      */
-    
+
     while ((syntax = ReadKeyword(fp, keyword)) != EQUALS) {
 	switch (syntax) {
 	  case STATUS:
 	    syntax = ReadKeyword(fp, keyword);
 	    if (syntax != CURRENT
 		&& syntax != OBSOLETE && syntax != DEPRECATED) {
-		fprintf(stderr, "%s:%d: scan error near `%s'\n", 
+		fprintf(stderr, "%s:%d: scan error near `%s'\n",
 			tnmMibFileName, line, keyword);
 		return NULL;
 	    }
@@ -1891,11 +1891,11 @@ ParseNotificationGroup (FILE *fp, char *name, TnmMibNode **nodeList)
 	    break;
 	}
     }
-    
+
     if (ParseNodeList(fp, nodeList, nodePtr) < 0) {
 	return NULL;
     }
-    
+
     return nodePtr;
 }
 
@@ -1912,7 +1912,7 @@ ParseObjectIdentity (FILE *fp, char *name, TnmMibNode **nodeList)
     char keyword[SYMBOL_MAXLEN];
     int	syntax;
     TnmMibNode *nodePtr;
-    
+
     nodePtr = TnmMibNewNode(name);
 
     /*
@@ -1925,7 +1925,7 @@ ParseObjectIdentity (FILE *fp, char *name, TnmMibNode **nodeList)
             syntax = ReadKeyword(fp, keyword);
             if (syntax != CURRENT
 		&& syntax != OBSOLETE && syntax != DEPRECATED) {
-		fprintf(stderr, "%s:%d: scan error near `%s'\n", 
+		fprintf(stderr, "%s:%d: scan error near `%s'\n",
 			tnmMibFileName, line, keyword);
 		return NULL;
             }
@@ -1944,7 +1944,7 @@ ParseObjectIdentity (FILE *fp, char *name, TnmMibNode **nodeList)
             break;
 	}
     }
-    
+
     if (ParseNodeList(fp, nodeList, nodePtr) < 0) {
 	return NULL;
     }
@@ -1972,14 +1972,14 @@ ParseObjectID(FILE *fp, char *name, TnmMibNode **nodeList)
 
     if ((syntax = ReadKeyword(fp, keyword)) != EQUALS)
       return NULL;
-    
+
     nodePtr = TnmMibNewNode(name);
     nodePtr->syntax = ASN1_OTHER;
-    
+
     if (ParseNodeList(fp, nodeList, nodePtr) < 0) {
 	return NULL;
     }
-    
+
     return (nodePtr);
 }
 
@@ -2004,7 +2004,7 @@ ParseObjectType (FILE *fp, char *name, TnmMibNode **nodeList)
 
     if ((syntax = ReadKeyword(fp, keyword)) != SYNTAX)
       return NULL;
-    
+
     nodePtr = TnmMibNewNode(name);
     nodePtr->fileOffset = -1;
 
@@ -2014,9 +2014,9 @@ ParseObjectType (FILE *fp, char *name, TnmMibNode **nodeList)
 
     if ((syntax = ReadKeyword(fp, keyword)) == ACCESS)
       return NULL;
-    
+
     nodePtr->syntax = syntax;
-    
+
     /*
      * no read keywords until ACCESS is found
      */
@@ -2024,7 +2024,7 @@ ParseObjectType (FILE *fp, char *name, TnmMibNode **nodeList)
     /*
      * if the syntax found is LABEL, we should lookup the typedef:
      */
-    
+
     if (syntax == LABEL) {
 
         nodePtr->typePtr = TnmMibFindType(keyword);
@@ -2038,10 +2038,10 @@ ParseObjectType (FILE *fp, char *name, TnmMibNode **nodeList)
 #endif
 	}
 
-	/* 
-	 * old eat-it-up code: skip anything to the ACCESS keyword: 
+	/*
+	 * old eat-it-up code: skip anything to the ACCESS keyword:
 	 */
-	
+
 	while ((syntax = ReadKeyword(fp, keyword)) != ACCESS)
 	  if (syntax == EOF)
 	    return NULL;
@@ -2049,18 +2049,18 @@ ParseObjectType (FILE *fp, char *name, TnmMibNode **nodeList)
     } else if (syntax == ASN1_INTEGER || syntax == ASN1_OCTET_STRING) {
 
 	int baseType = syntax;
-    
+
 	/*
 	 * if the syntax found is INTEGER, there may follow the enums for a
 	 * textual description of the integer value; extract - don't skip.
 	 */
 
 	char *restrictions = NULL;
-	
-	/* 
+
+	/*
 	 * We may get something like ``{ foo ( 99), ... }'' or
 	 * ``(0..99)'' or nothing.
-	 */ 
+	 */
 
 	syntax = ReadKeyword(fp, keyword);
 	if (syntax == LEFTBRACKET) {
@@ -2091,9 +2091,9 @@ ParseObjectType (FILE *fp, char *name, TnmMibNode **nodeList)
 	    /* got LEFTPAREN: ``('' */
 	    /* XXX: fetch here ranges... -- we simply skip */
 	    int level = 1;
-	    
+
 	    while ((syntax = ReadKeyword(fp, keyword)) != RIGHTPAREN
-		   && level > 0) 
+		   && level > 0)
 	      {
 		  if (syntax == EOF)
 		    return NULL;
@@ -2102,12 +2102,12 @@ ParseObjectType (FILE *fp, char *name, TnmMibNode **nodeList)
 	      }
 #endif
 	}
-	
-	/* 
-	 * We simply skip up to the ACCESS key, like the old version 
-	 * did: wrong, but effective... 
+
+	/*
+	 * We simply skip up to the ACCESS key, like the old version
+	 * did: wrong, but effective...
 	 */
-	
+
 	while (syntax != ACCESS) {
 	    syntax = ReadKeyword(fp, keyword);
 	    if (syntax == EOF) {
@@ -2123,7 +2123,7 @@ ParseObjectType (FILE *fp, char *name, TnmMibNode **nodeList)
 	    if (islower(nodePtr->label[0])) {
 		nodePtr->label[0] =  toupper(nodePtr->label[0]);
 	    }
-	    nodePtr->typePtr = CreateType(nodePtr->label, 
+	    nodePtr->typePtr = CreateType(nodePtr->label,
 					  baseType, 0, restrictions);
 	    nodePtr->typePtr->macro = TNM_MIB_OBJECTTYPE;
 	    nodePtr->label[0] = c;
@@ -2141,63 +2141,63 @@ ParseObjectType (FILE *fp, char *name, TnmMibNode **nodeList)
                 return NULL;
             }
         }
-	/* we are fine. now continue below with the ACCESS mode: */ 
+	/* we are fine. now continue below with the ACCESS mode: */
     } else {
-	
-	/* 
-	* old eat-it-up code: skip anything to the ACCESS keyword: 
+
+	/*
+	* old eat-it-up code: skip anything to the ACCESS keyword:
 	*/
-	
+
 	while ((syntax = ReadKeyword(fp, keyword)) != ACCESS)
 	  if (syntax == EOF)
 	    return NULL;
     }
-    
+
     /*
      * next keyword defines ACCESS mode for object
      */
 
     syntax = ReadKeyword(fp, keyword);
     if (syntax < READONLY || syntax > NOACCESS) {
-	fprintf(stderr, "%s:%d: scan error near `%s'\n", 
+	fprintf(stderr, "%s:%d: scan error near `%s'\n",
 		tnmMibFileName, line, keyword);
 	return NULL;
     }
 
     switch (syntax) {
-      case READONLY:   
-	  nodePtr->access = TNM_MIB_READONLY; 
+      case READONLY:
+	  nodePtr->access = TNM_MIB_READONLY;
 	  break;
-      case READCREATE: 
-	  nodePtr->access = TNM_MIB_READCREATE; 
+      case READCREATE:
+	  nodePtr->access = TNM_MIB_READCREATE;
 	  break;
-      case READWRITE:  
-	  nodePtr->access = TNM_MIB_READWRITE; 
+      case READWRITE:
+	  nodePtr->access = TNM_MIB_READWRITE;
 	  break;
       case WRITEONLY:		/* RFC 1908 section 2.1 point (9) */
-	  nodePtr->access = TNM_MIB_READWRITE; 
+	  nodePtr->access = TNM_MIB_READWRITE;
 	  break;
-      case FORNOTIFY:  
-	  nodePtr->access = TNM_MIB_FORNOTIFY; 
+      case FORNOTIFY:
+	  nodePtr->access = TNM_MIB_FORNOTIFY;
 	  break;
-      default:         
+      default:
 	  nodePtr->access = TNM_MIB_NOACCESS;
     }
-    
+
     /*
      * next keyword must be STATUS
      */
 
     if ((syntax = ReadKeyword(fp, keyword)) != STATUS)
 	return NULL;
-    
+
     /*
      * next keyword defines status of object
      */
 
     syntax = ReadKeyword(fp, keyword);
     if (syntax < MANDATORY || syntax > DEPRECATED) {
-	fprintf(stderr, "%s:%d: scan error near `%s'\n", 
+	fprintf(stderr, "%s:%d: scan error near `%s'\n",
 		tnmMibFileName, line, keyword);
 	return NULL;
     }
@@ -2284,9 +2284,9 @@ ParseObjectType (FILE *fp, char *name, TnmMibNode **nodeList)
 	    }
 	    len = nodePtr->index ? strlen(nodePtr->index) : 0;
 	    if (len > 2) {
-		if (nodePtr->index[0] == '\'' 
+		if (nodePtr->index[0] == '\''
 		    && nodePtr->index[len-2] == '\''
-		    && (nodePtr->index[len-1] == 'h' 
+		    && (nodePtr->index[len-1] == 'h'
 			|| nodePtr->index[len-1] == 'H')) {
 		    if (len == 3) {
 			nodePtr->index[0] = '\0';
@@ -2323,7 +2323,7 @@ ParseObjectType (FILE *fp, char *name, TnmMibNode **nodeList)
     if (ParseNodeList(fp, nodeList, nodePtr) < 0) {
 	return NULL;
     }
-    
+
     return nodePtr;
 }
 
@@ -2349,21 +2349,21 @@ ParseNodeList(FILE *fp, TnmMibNode **nodeList, TnmMibNode *nodePtr)
 	 * Check if it is the id for this OBJECT-IDENTIFIER. Otherwise,
 	 * create a new node and link it to the node list.
 	 */
-	
+
 	if (subidList->label == NULL) {
 	    nodePtr->parentName = ckstrdup(subidList->parentName);
 	    nodePtr->subid = subidList->subid;
 	} else {
-	    AddNewNode(nodeList, subidList->label, 
+	    AddNewNode(nodeList, subidList->label,
 		       subidList->parentName,
 		       (unsigned) subidList->subid);
 	}
-	
+
 	freePtr  = subidList;
 	subidList = subidList->next;
 	ckfree ((char *) freePtr);
     }
-    
+
     return 0;
 }
 
@@ -2375,7 +2375,7 @@ ParseNodeList(FILE *fp, TnmMibNode **nodeList, TnmMibNode *nodePtr)
  */
 
 static void
-HashKeywords()
+HashKeywords(void)
 {
     char *cp = NULL;
     int	hash_val = 0;
@@ -2383,10 +2383,10 @@ HashKeywords()
     Keyword *tp = NULL;
 
     memset((char *) hashtab, 0, sizeof (hashtab));
-    
+
     for (tp = keywords; tp->name; tp++) {
 	hash_val = 0;
-	for (cp = tp->name; *cp; cp++) 
+	for (cp = tp->name; *cp; cp++)
 	  hash_val += *cp;
 	hash_index = HASH (hash_val);
 	tp->hash   = hash_val;
@@ -2413,7 +2413,7 @@ ReadKeyword(FILE *fp, char *keyword)
     char quoteChar = '\0';
 
     Keyword *tp;
-    
+
     *keyword = '\0';
 
     /*
@@ -2474,7 +2474,7 @@ ReadKeyword(FILE *fp, char *keyword)
     if (ch == '-') {
 	hash_val += ch;
 	*cp++ = ch;
-	
+
 	if ((ch = getc (fp)) == '-') {
 	    *keyword = '\0';
 	    while ((ch = getc (fp)) != EOF) {
@@ -2484,19 +2484,19 @@ ReadKeyword(FILE *fp, char *keyword)
 		}
 	    }
 	    if (ch == EOF) return EOF;
-	    
+
 	    lastchar = ' ';
 	    return ReadKeyword(fp, keyword);
 	}
     }
-   
+
     /*
      * Read characters until end of keyword is found
      */
 
     do {
 	if (ch == '\n') line++;
-	
+
 	if (isspace (ch) || ch == '(' || ch == ')' || ch =='{' ||
 	    ch == '}' || ch == ',' || ch == ';' || ch == '.' ||
 	    ch == '|') {
@@ -2523,7 +2523,7 @@ ReadKeyword(FILE *fp, char *keyword)
 	    } else {
 		lastchar = ch;
 	    }
-	       
+
 	    *cp = '\0';
 
 	    /*
@@ -2534,38 +2534,38 @@ ReadKeyword(FILE *fp, char *keyword)
 		if ((tp->hash == hash_val) && !fstrcmp (tp->name, keyword))
 		  break;
 	    }
-	    
+
 	    if (tp != NULL) {
 
 		/*
 		 * if keyword is not complete, continue; otherwise return
 		 */
-		
+
 		if (tp->key == CONTINUE) {
 		    lastchar = ch;
 		    continue;
 		}
 		return tp->key;
 	    }
-	    
+
 	    /*
 	     * is it a LABEL ?
 	     */
-	    
+
 	    for (cp = keyword; *cp; cp++) {
 		if (cp == keyword && (*cp == '-' || *cp == '+')) continue;
 		if (! isdigit (*cp)) return LABEL;
 	    }
-	    
+
 	    /*
 	     * keywords consists of digits only
 	     */
-	    
-	    return (keyword[0] == '-' || keyword[0] == '+') 
+
+	    return (keyword[0] == '-' || keyword[0] == '+')
 		? SIGNEDNUMBER : NUMBER;
 
 	} else {
-	
+
 	    /*
 	     * build keyword and hashvalue
 	     */
@@ -2574,7 +2574,7 @@ ReadKeyword(FILE *fp, char *keyword)
 	    *cp++ = ch;
 	}
     } while ((ch = getc (fp)) != EOF);
-    
+
     return EOF;
 }
 
@@ -2590,8 +2590,8 @@ ReadKeyword(FILE *fp, char *keyword)
 static struct subid*
 ReadSubID (FILE *fp)
 {
-   char	name[SYMBOL_MAXLEN]; 
-   char	keyword[SYMBOL_MAXLEN]; 
+   char	name[SYMBOL_MAXLEN];
+   char	keyword[SYMBOL_MAXLEN];
    int is_child	= 0;
    int syntax = 0;
    struct subid	*np = NULL;
@@ -2616,13 +2616,13 @@ ReadSubID (FILE *fp)
 	 do_label:
 
 	   /* allocate memory for new element */
-	   
+
 	   np = (struct subid *) ckalloc (sizeof(struct subid));
 	   memset((char *) np, 0, sizeof (struct subid));
 	   np->subid  = -1;
-	   
+
 	   /* if this label followed another one, it's the child */
-	   
+
 	   if (is_child) {
 	       np->parentName = ckstrdup (name);
                np->label = ckstrdup (keyword);
@@ -2630,7 +2630,7 @@ ReadSubID (FILE *fp)
 	       np->parentName = ckstrdup (keyword);
                is_child = 1;		/* next labels are children   */
 	   }
-	   
+
 	   np->next = subidList;
 	   subidList = np;
 	   strcpy (name, keyword);
@@ -2640,7 +2640,7 @@ ReadSubID (FILE *fp)
 	   np->subid = atoi (keyword);
 	   if ((syntax = ReadKeyword(fp, keyword)) != RIGHTPAREN)
 	     return NULL;
-	   break;            
+	   break;
          case NUMBER:
 	   if (! np)
 	     {

@@ -12,8 +12,8 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+# include <config.h>
+#endif /* HAVE_CONFIG_H */
 
 #include "tnmSnmp.h"
 #include "tnmMib.h"
@@ -48,7 +48,7 @@ static void
 PoolSave		(FILE *fp);
 
 static void
-SaveRest		(TnmMibRest *restPtr, int restKind, 
+SaveRest		(TnmMibRest *restPtr, int restKind,
 				     FILE *fp);
 static void
 SaveType		(TnmMibType *typePtr, int *i, FILE *fp);
@@ -60,7 +60,7 @@ static void
 CollectData		(int *numRests, int *numTcs,
 				     int *numNodes, TnmMibNode *nodePtr);
 static void
-SaveData		(FILE *fp, int numRests, int numTcs, 
+SaveData		(FILE *fp, int numRests, int numTcs,
 				     int numNodes, TnmMibNode *nodePtr);
 
 
@@ -70,7 +70,7 @@ SaveData		(FILE *fp, int numRests, int numTcs,
  * PoolInit --
  *
  *	This procedure initializes the hash table that is used to
- *	create a string pool. The pool is used to eliminate 
+ *	create a string pool. The pool is used to eliminate
  *	duplicated strings.
  *
  * Results:
@@ -83,7 +83,7 @@ SaveData		(FILE *fp, int numRests, int numTcs,
  */
 
 static void
-PoolInit()
+PoolInit(void)
 {
     poolOffset = 0;
     if (poolHashTable == NULL) {
@@ -111,7 +111,7 @@ PoolInit()
  */
 
 static void
-PoolDelete()
+PoolDelete(void)
 {
     if (poolHashTable) {
         Tcl_DeleteHashTable(poolHashTable);
@@ -123,10 +123,10 @@ PoolDelete()
  *
  * PoolAddString --
  *
- *	This procedure adds a string to the pool if it is not yet 
+ *	This procedure adds a string to the pool if it is not yet
  *	there. The value is initialized to mark this entry as used.
- *	The total offset is incremented to get total memory required 
- *	for the string pool. 
+ *	The total offset is incremented to get total memory required
+ *	for the string pool.
  *
  * Results:
  *	None.
@@ -158,7 +158,7 @@ PoolAddString(char *s)
  *
  * PoolGetOffset --
  *
- *	This procedure returns the offset to the given string in the 
+ *	This procedure returns the offset to the given string in the
  *	string pool or 0 if the string is not in the pool.
  *
  * Results:
@@ -282,7 +282,7 @@ CollectData(int *numEnums, int *numTcs, int *numNodes, TnmMibNode *nodePtr)
 	    }
 	}
     }
-    for (typePtr = tnmMibTypeList; 
+    for (typePtr = tnmMibTypeList;
 	 typePtr != tnmMibTypeSaveMark; typePtr = typePtr->nextPtr) {
         (*numTcs)++;
 	PoolAddString(typePtr->name);
@@ -327,7 +327,7 @@ SaveRest(TnmMibRest *restPtr, int restKind, FILE *fp)
 
     if (restKind == TNM_MIB_REST_ENUMS) {
 	memcpy((char *) &rest, (char *) restPtr, sizeof(TnmMibRest));
-	rest.rest.intEnum.enumLabel = 
+	rest.rest.intEnum.enumLabel =
 	    (char *) PoolGetOffset(restPtr->rest.intEnum.enumLabel);
 	rest.nextPtr = (TnmMibRest *) (restPtr->nextPtr ? 1 : 0);
 	restPtr = &rest;
@@ -406,7 +406,7 @@ SaveNode(TnmMibNode *nodePtr, int *i, FILE *fp)
 	no.typePtr = (TnmMibType *) ++(*i);
     }
     no.nextPtr = (TnmMibNode *) (nodePtr->nextPtr ? 1 : 0);
-    
+
     fwrite((char *) &no, sizeof(TnmMibNode), 1, fp);
 }
 
@@ -447,7 +447,7 @@ SaveData(fp, numEnums, numTCs, numNodes, nodePtr)
     TnmMibRest *ePtr;
     TnmMibType *tPtr;
     int i;
-    
+
     /*
      * Save numEnums TnmMibRest structures:
      */
@@ -479,7 +479,7 @@ SaveData(fp, numEnums, numTCs, numNodes, nodePtr)
     for (tPtr=tnmMibTypeList; tPtr != tnmMibTypeSaveMark; tPtr = tPtr->nextPtr) {
 	SaveType(tPtr, &i, fp);
     }
-    
+
     /*
      * Save numNodes TnmMibNode structures:
      */
@@ -510,7 +510,7 @@ SaveData(fp, numEnums, numTCs, numNodes, nodePtr)
 void
 TnmMibWriteFrozen(FILE *fp, TnmMibNode *nodePtr)
 {
-    int numEnums, numTcs, numNodes; 
+    int numEnums, numTcs, numNodes;
     PoolInit();
     CollectData(&numEnums, &numTcs, &numNodes, nodePtr);
     PoolSave(fp);
@@ -523,7 +523,7 @@ TnmMibWriteFrozen(FILE *fp, TnmMibNode *nodePtr)
  *
  * TnmMibReadFrozen --
  *
- *	This procedure reads a frozen MIB file that was written by 
+ *	This procedure reads a frozen MIB file that was written by
  *	TnmMibWriteFrozen(). The expected format is:
  *
  *	int (stringpool size)
@@ -558,7 +558,7 @@ TnmMibReadFrozen(FILE *fp)
     TnmMibNode *nodes;
 
     /*
-     * First, read the string space: 
+     * First, read the string space:
      */
 
     if (1 != fread((char *) &poolSize, sizeof(int), 1, fp)) {
@@ -599,18 +599,18 @@ TnmMibReadFrozen(FILE *fp)
 	    ckfree((char *) enums);
 	    return NULL;
 	}
-    
-	/* 
+
+	/*
 	 * Chain the pointers:
 	 */
-	
+
 	for (i = 0, restPtr = enums; i < (int) numEnums; i++, restPtr++) {
 	    restPtr->nextPtr = restPtr->nextPtr ? restPtr + 1 : 0;
 	}
     }
 
     /*
-     * Next, read the textual conventions: 
+     * Next, read the textual conventions:
      */
 
     if (1 != fread((char *) &numTcs, sizeof(numTcs), 1, fp)) {
@@ -630,9 +630,9 @@ TnmMibReadFrozen(FILE *fp)
 	    ckfree((char *) tcs);
 	    return NULL;
 	}
-	
-	/* 
-	 * Adjust string and enum pointers: 
+
+	/*
+	 * Adjust string and enum pointers:
 	 */
 
 	for (i = 0, typePtr = tcs; i < (int) numTcs; i++, typePtr++) {
@@ -654,7 +654,7 @@ TnmMibReadFrozen(FILE *fp)
 		    for (restPtr = typePtr->restList;
 			 restPtr;
 			 restPtr = restPtr->nextPtr) {
-			restPtr->rest.intEnum.enumLabel = 
+			restPtr->rest.intEnum.enumLabel =
 			    (int) restPtr->rest.intEnum.enumLabel + pool;
 		    }
 		}
@@ -662,7 +662,7 @@ TnmMibReadFrozen(FILE *fp)
 	    if (typePtr->name[0] != '_') {
 		TnmMibAddType(typePtr);
 	    }
-	}	
+	}
     }
 
     /*
@@ -686,7 +686,7 @@ TnmMibReadFrozen(FILE *fp)
 	    ckfree((char *) nodes);
 	    return NULL;
 	}
-	
+
 	/*
 	 * Adjust string and tc pointers:
 	 */
@@ -710,7 +710,7 @@ TnmMibReadFrozen(FILE *fp)
 	}
 	root = nodes;
     }
-    
+
     return root;
 }
 

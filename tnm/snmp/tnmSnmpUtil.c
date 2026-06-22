@@ -17,14 +17,14 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+# include <config.h>
+#endif /* HAVE_CONFIG_H */
 
 #include "tnmSnmp.h"
 #include "tnmMib.h"
 #include "tnmMD5.h"
 
-/* 
+/*
  * Flag that controls hexdump. See the watch command for its use.
  */
 
@@ -169,7 +169,7 @@ FindAuthKey		(TnmSnmp *session);
 static void
 SaveAuthKey		(TnmSnmp *session);
 
-static void 
+static void
 MakeAuthKey		(TnmSnmp *session);
 
 static int
@@ -202,7 +202,7 @@ static void
 SessionDestroyProc(char *memPtr)
 {
     TnmSnmp *session = (TnmSnmp *) memPtr;
-    
+
     Tcl_DecrRefCount(session->community);
     Tcl_DecrRefCount(session->context);
     Tcl_DecrRefCount(session->user);
@@ -222,9 +222,9 @@ SessionDestroyProc(char *memPtr)
     if (session->tagList) {
 	Tcl_DecrRefCount(session->tagList);
     }
-    
+
     while (session->bindPtr) {
-	TnmSnmpBinding *bindPtr = session->bindPtr;	
+	TnmSnmpBinding *bindPtr = session->bindPtr;
 	session->bindPtr = bindPtr->nextPtr;
 	if (bindPtr->command) {
 	    ckfree(bindPtr->command);
@@ -238,7 +238,7 @@ SessionDestroyProc(char *memPtr)
     if (session->type == TNM_SNMP_RESPONDER) {
 	TnmSnmpResponderClose(session);
     }
-    
+
     ckfree((char *) session);
 }
 
@@ -274,7 +274,7 @@ RequestDestroyProc(char *memPtr)
  *
  * FindAuthKey --
  *
- *	This procedure searches for an already computed key in the 
+ *	This procedure searches for an already computed key in the
  *	list of cached authentication keys.
  *
  * Results:
@@ -290,10 +290,10 @@ static int
 FindAuthKey(TnmSnmp *session)
 {
     KeyCacheElem *keyPtr;
-    
+
     for (keyPtr = firstKeyCacheElem; keyPtr; keyPtr = keyPtr->nextPtr) {
-	if ((strcmp(session->password, keyPtr->password) == 0) 
-	    && (memcmp(session->agentID, keyPtr->agentID, 
+	if ((strcmp(session->password, keyPtr->password) == 0)
+	    && (memcmp(session->agentID, keyPtr->agentID,
 		       USEC_MAX_AGENTID) == 0)) {
 	    memcpy(session->authKey, keyPtr->authKey, TNM_MD5_SIZE);
 	    return TCL_OK;
@@ -324,7 +324,7 @@ static void
 SaveAuthKey(TnmSnmp *session)
 {
     KeyCacheElem *keyPtr;
-    
+
     keyPtr = (KeyCacheElem *) ckalloc(sizeof(KeyCacheElem));
     keyPtr->password = ckstrdup(session->password);
     memcpy(keyPtr->agentID, session->agentID, USEC_MAX_AGENTID);
@@ -338,9 +338,9 @@ SaveAuthKey(TnmSnmp *session)
  *
  * MakeAuthKey --
  *
- *	This procedure converts a 0 terminated password string into 
- *	a 16 byte MD5 key. This is a slighly modified version taken 
- *	from RFC 1910. We keep a cache of all computed passwords to 
+ *	This procedure converts a 0 terminated password string into
+ *	a 16 byte MD5 key. This is a slighly modified version taken
+ *	from RFC 1910. We keep a cache of all computed passwords to
  *	make repeated lookups faster.
  *
  * Results:
@@ -353,7 +353,7 @@ SaveAuthKey(TnmSnmp *session)
  *----------------------------------------------------------------------
  */
 
-static void 
+static void
 MakeAuthKey(TnmSnmp *session)
 {
     MD5_CTX MD;
@@ -363,7 +363,7 @@ MakeAuthKey(TnmSnmp *session)
     int found, valid = 0, passwordlen = strlen((char *) session->password);
 
     /*
-     * We simply return if we do not have a password or if the 
+     * We simply return if we do not have a password or if the
      * agentID is zero (which is an initialized agentID value.
      */
 
@@ -392,23 +392,23 @@ MakeAuthKey(TnmSnmp *session)
 		 * beginning of the password as necessary.
 		 */
 	    }
-	    
+
 	    TnmMD5Update(&MD, password_buf, 64);
-	    
+
 	    /*
 	     * 1048576 is divisible by 64, so the last MDupdate will be
 	     * aligned as well.
 	     */
 	    count += 64;
 	}
-	
+
 	TnmMD5Final(password_buf, &MD);
-	memcpy(password_buf+TNM_MD5_SIZE, (char *) session->agentID, 
+	memcpy(password_buf+TNM_MD5_SIZE, (char *) session->agentID,
 	       USEC_MAX_AGENTID);
-	memcpy(password_buf+TNM_MD5_SIZE+USEC_MAX_AGENTID, password_buf, 
+	memcpy(password_buf+TNM_MD5_SIZE+USEC_MAX_AGENTID, password_buf,
 	       TNM_MD5_SIZE);
 	TnmMD5Init(&MD);   /* initialize MD5 */
-	TnmMD5Update(&MD, password_buf, 
+	TnmMD5Update(&MD, password_buf,
 		      TNM_MD5_SIZE+USEC_MAX_AGENTID+TNM_MD5_SIZE);
 	TnmMD5Final(session->authKey, &MD);
 	SaveAuthKey(session);
@@ -444,9 +444,9 @@ static int
 FindAgentID(TnmSnmp *session)
 {
     AgentIDCacheElem *idPtr;
-    
+
     for (idPtr = firstAgentIDCacheElem; idPtr; idPtr = idPtr->nextPtr) {
-	if (memcmp(&session->maddr, &idPtr->addr, 
+	if (memcmp(&session->maddr, &idPtr->addr,
 		   sizeof(struct sockaddr_in)) == 0) {
 	    memcpy(session->agentID, idPtr->agentID, USEC_MAX_AGENTID);
 	    session->agentBoots = idPtr->agentBoots;
@@ -463,7 +463,7 @@ FindAgentID(TnmSnmp *session)
  *
  * SaveAgentID --
  *
- *	This procedure adds a new agentID to the internal list of 
+ *	This procedure adds a new agentID to the internal list of
  *	cached agentIDs. It also caches the agentBoots and agentTime
  *	values.
  *
@@ -480,7 +480,7 @@ static void
 SaveAgentID(TnmSnmp *session)
 {
     AgentIDCacheElem *idPtr;
-    
+
     for (idPtr = firstAgentIDCacheElem; idPtr; idPtr = idPtr->nextPtr) {
 	if (memcmp(&session->maddr, &idPtr->addr,
 		   sizeof(struct sockaddr_in)) == 0) {
@@ -534,7 +534,7 @@ TnmSnmpUsecSetAgentID(TnmSnmp *session)
  * TnmSnmpUsecGetAgentID --
  *
  *	This procedure tries to find an already known agentID for the
- *	SNMP session. It uses the internal cache of agentIDs. The 
+ *	SNMP session. It uses the internal cache of agentIDs. The
  *	authentication key is re-computed if an agentID is found.
  *
  * Results:
@@ -603,13 +603,13 @@ TnmSnmpEvalCallback(Tcl_Interp *interp, TnmSnmp *session, TnmSnmpPdu *pdu, char 
 	scanPtr++;
 	startPtr = scanPtr + 1;
 	switch (*scanPtr) {
-	  case 'R':  
+	  case 'R':
 	    sprintf(buf, "%d", pdu->requestId);
 	    Tcl_DStringAppend(&tclCmd, buf, -1);
 	    break;
 	  case 'S':
 	    if (session && session->interp && session->token) {
-		Tcl_DStringAppend(&tclCmd, 
+		Tcl_DStringAppend(&tclCmd,
 		  Tcl_GetCommandName(session->interp, session->token), -1);
 	    }
 	    break;
@@ -682,21 +682,21 @@ TnmSnmpEvalCallback(Tcl_Interp *interp, TnmSnmp *session, TnmSnmpPdu *pdu, char 
 	}
     }
     Tcl_DStringAppend(&tclCmd, startPtr, scanPtr - startPtr);
-    
+
     /*
      * Now evaluate the callback function and issue a background
      * error if the callback fails for some reason. Return the
      * original error message and code to the caller.
      */
-    
+
     Tcl_AllowExceptions(interp);
     code = Tcl_GlobalEval(interp, Tcl_DStringValue(&tclCmd));
     Tcl_DStringFree(&tclCmd);
 
     /*
      * Call the usual error handling proc if we have evaluated
-     * a binding not bound to a specific instance. Bindings 
-     * bound to an instance are usually called during PDU 
+     * a binding not bound to a specific instance. Bindings
+     * bound to an instance are usually called during PDU
      * processing where it is important to get the error message
      * back.
      */
@@ -707,7 +707,7 @@ TnmSnmpEvalCallback(Tcl_Interp *interp, TnmSnmp *session, TnmSnmpPdu *pdu, char 
 	Tcl_BackgroundError(interp);
 	Tcl_SetResult(interp, errorMsg, TCL_DYNAMIC);
     }
-    
+
     return code;
 }
 
@@ -733,7 +733,7 @@ TnmSnmpEvalBinding(Tcl_Interp *interp, TnmSnmp *session, TnmSnmpPdu *pdu, int ev
 {
     int code = TCL_OK;
     TnmSnmpBinding *bindPtr = session->bindPtr;
-    
+
     while (bindPtr) {
 	if (bindPtr->event == event) break;
 	bindPtr = bindPtr->nextPtr;
@@ -754,7 +754,7 @@ TnmSnmpEvalBinding(Tcl_Interp *interp, TnmSnmp *session, TnmSnmpPdu *pdu, int ev
  *
  * TnmSnmpDumpPDU --
  *
- *	This procedure dumps the contents of a pdu to standard output. 
+ *	This procedure dumps the contents of a pdu to standard output.
  *	This is just a debugging aid.
  *
  * Results:
@@ -789,9 +789,9 @@ TnmSnmpDumpPDU(Tcl_Interp *interp, TnmSnmpPdu *pdu)
 	if (status == NULL) {
 	    status = "(unknown error code)";
 	}
-	
+
 	if (pdu->type == ASN1_SNMP_GETBULK) {
-	    sprintf(buffer, "%s %d non-repeaters %d max-repetitions %d\n", 
+	    sprintf(buffer, "%s %d non-repeaters %d max-repetitions %d\n",
 		    name, pdu->requestId,
 		    pdu->errorStatus, pdu->errorIndex);
 	} else if (pdu->type == ASN1_SNMP_TRAP1) {
@@ -799,13 +799,13 @@ TnmSnmpDumpPDU(Tcl_Interp *interp, TnmSnmpPdu *pdu)
 	} else if (pdu->errorStatus == TNM_SNMP_NOERROR) {
 	    sprintf(buffer, "%s %d %s\n", name, pdu->requestId, status);
 	} else {
-	    sprintf(buffer, "%s %d %s at %d\n", 
+	    sprintf(buffer, "%s %d %s at %d\n",
 		    name, pdu->requestId, status, pdu->errorIndex);
 	}
 
 	Tcl_DStringAppend(&dst, buffer, -1);
 
-	code = Tcl_SplitList(interp, Tcl_DStringValue(&pdu->varbind), 
+	code = Tcl_SplitList(interp, Tcl_DStringValue(&pdu->varbind),
 			     &argc, &argv);
 	if (code == TCL_OK) {
 	    for (i = 0; i < argc; i++) {
@@ -879,7 +879,7 @@ TnmSnmpMD5Digest(u_char *packet, int length, u_char *key, u_char *digest)
  *
  * TnmSnmpCreateSession --
  *
- *	This procedure allocates and initializes a TnmSnmp 
+ *	This procedure allocates and initializes a TnmSnmp
  *	structure.
  *
  * Results:
@@ -1015,7 +1015,7 @@ TnmSnmpCreateRequest(int id, u_char *packet, int packetlen, TnmSnmpRequestProc *
 
     /*
      * Allocate a TnmSnmpRequest structure together with some space to
-     * hold the encoded packet. Allocating this in one ckalloc call 
+     * hold the encoded packet. Allocating this in one ckalloc call
      * simplifies and thus speeds up memory management.
      */
 
@@ -1066,7 +1066,7 @@ TnmSnmpFindRequest(int id)
  *
  * TnmSnmpQueueRequest --
  *
- *	This procedure queues a request into the wait queue or checks 
+ *	This procedure queues a request into the wait queue or checks
  *	if queued requests should be activated. The queue is processed
  *	in FIFO order with the following constraints:
  *
@@ -1076,7 +1076,7 @@ TnmSnmpFindRequest(int id)
  *	2. The total number of active requests is smaller than the
  *	   window size of this session.
  *
- *	The second rule makes sure that you can't flood a network by 
+ *	The second rule makes sure that you can't flood a network by
  *	e.g. creating thousand sessions all with a small window size
  *	sending one request. If the parameter which specifies the
  *	new request is NULL, only queue processing will take place.
@@ -1135,7 +1135,7 @@ TnmSnmpQueueRequest(TnmSnmp *session, TnmSnmpRequest *request)
 
     for (rPtr = queueHead; rPtr && waiting; rPtr = rPtr->nextPtr) {
         if (session->window && active >= session->window) break;
-	if (! rPtr->sends && (rPtr->session->active < rPtr->session->window 
+	if (! rPtr->sends && (rPtr->session->active < rPtr->session->window
 			      || rPtr->session->window == 0)) {
 	    TnmSnmpTimeoutProc((ClientData) rPtr);
 	    active++;
@@ -1153,7 +1153,7 @@ TnmSnmpQueueRequest(TnmSnmp *session, TnmSnmpRequest *request)
  *
  * TnmSnmpDeleteRequest --
  *
- *	This procedure deletes a request from the list of known 
+ *	This procedure deletes a request from the list of known
  *	requests. This will also free all resources and event
  *	handlers for this request.
  *
@@ -1174,7 +1174,7 @@ TnmSnmpDeleteRequest(TnmSnmpRequest *request)
 
     /*
      * Check whether the request still exists. It may have been
-     * removed because the session for this request has been 
+     * removed because the session for this request has been
      * destroyed during callback processing.
      */
 
@@ -1182,13 +1182,13 @@ TnmSnmpDeleteRequest(TnmSnmpRequest *request)
 	if (rPtr == request) break;
     }
     if (! rPtr) return;
-    
-    /* 
+
+    /*
      * Check whether the session is still in the session list.
      * We sometimes get called when the session has already been
      * destroyed as a side effect of evaluating callbacks.
      */
-    
+
     for (session = tnmSnmpList; session; session = session->nextPtr) {
 	if (session == request->session) break;
     }
@@ -1200,7 +1200,7 @@ TnmSnmpDeleteRequest(TnmSnmpRequest *request)
 	    session->waiting--;
 	}
     }
-    
+
     /*
      * Remove the request from the list of outstanding requests.
      * and free the resources allocated for this request.
@@ -1223,7 +1223,7 @@ TnmSnmpDeleteRequest(TnmSnmpRequest *request)
      * Update the request queue. This will activate async requests
      * that have been queued because of the window size.
      */
-     
+
     if (session) {
 	TnmSnmpQueueRequest(session, NULL);
     }
@@ -1246,7 +1246,7 @@ TnmSnmpDeleteRequest(TnmSnmpRequest *request)
  */
 
 int
-TnmSnmpGetRequestId()
+TnmSnmpGetRequestId(void)
 {
     int id;
     TnmSnmpRequest *rPtr = queueHead;
@@ -1357,11 +1357,11 @@ Tnm_SnmpMergeVBList(int varBindSize, SNMP_VarBind *varBindPtr)
 
     for (i = 0; i < varBindSize; i++) {
         Tcl_DStringStartSublist(&list);
-	Tcl_DStringAppendElement(&list, 
+	Tcl_DStringAppendElement(&list,
 			     varBindPtr[i].soid ? varBindPtr[i].soid : "");
-	Tcl_DStringAppendElement(&list, 
+	Tcl_DStringAppendElement(&list,
 			     varBindPtr[i].syntax ? varBindPtr[i].syntax : "");
-	Tcl_DStringAppendElement(&list, 
+	Tcl_DStringAppendElement(&list,
 			     varBindPtr[i].value ? varBindPtr[i].value : "");
 	Tcl_DStringEndSublist(&list);
     }
@@ -1390,7 +1390,7 @@ void
 Tnm_SnmpFreeVBList(int varBindSize, SNMP_VarBind *varBindPtr)
 {
     int i;
-    
+
     for (i = 0; i < varBindSize; i++) {
 	if (varBindPtr[i].freePtr) {
 	    ckfree(varBindPtr[i].freePtr);
@@ -1507,7 +1507,7 @@ TnmSnmpNorm(Tcl_Interp *interp, Tcl_Obj *objPtr, int flags)
 		char msg[80];
 		sprintf(msg, "illegal number of elements in varbind %d", i);
 		Tcl_ResetResult(interp);
-		Tcl_AppendStringsToObj(Tcl_GetObjResult(interp), 
+		Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
 				       msg, (char *) NULL);
 		goto errorExit;
 	    }
@@ -1532,7 +1532,7 @@ TnmSnmpNorm(Tcl_Interp *interp, Tcl_Obj *objPtr, int flags)
 	Tcl_InvalidateStringRep(oidObjPtr);
 	Tcl_ListObjAppendElement(interp, vbPtr, oidObjPtr);
 
-	/* 
+	/*
 	 * Lookup the type in the MIB if there is no type given in the
 	 * varbind element.
 	 */
@@ -1544,7 +1544,7 @@ TnmSnmpNorm(Tcl_Interp *interp, Tcl_Obj *objPtr, int flags)
 		char msg[80];
 		sprintf(msg, "failed to lookup the type for varbind %d", i);
 		Tcl_ResetResult(interp);
-		Tcl_AppendStringsToObj(Tcl_GetObjResult(interp), 
+		Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
 				       msg, (char *) NULL);
 		goto errorExit;
 	    }
@@ -1555,7 +1555,7 @@ TnmSnmpNorm(Tcl_Interp *interp, Tcl_Obj *objPtr, int flags)
 		TnmGetTableValue(tnmSnmpTypeTable, (unsigned) syntax), -1);
 	}
 
-	type = TnmGetTableKeyFromObj(NULL, tnmSnmpTypeTable, 
+	type = TnmGetTableKeyFromObj(NULL, tnmSnmpTypeTable,
 				     typeObjPtr, NULL);
 	if (type == -1) {
 	    type = TnmGetTableKeyFromObj(NULL, tnmSnmpExceptionTable,
@@ -1565,7 +1565,7 @@ TnmSnmpNorm(Tcl_Interp *interp, Tcl_Obj *objPtr, int flags)
 	    invalidType:
 		sprintf(msg, "illegal type in varbind %d", i);
 		Tcl_ResetResult(interp);
-		Tcl_AppendStringsToObj(Tcl_GetObjResult(interp), 
+		Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
 				       msg, (char *) NULL);
 		goto errorExit;
 	    }
@@ -1588,7 +1588,7 @@ TnmSnmpNorm(Tcl_Interp *interp, Tcl_Obj *objPtr, int flags)
 		}
 		if (nodePtr) {
 		    Tcl_Obj *value;
-		    value = TnmMibScanValue(nodePtr->typePtr, nodePtr->syntax, 
+		    value = TnmMibScanValue(nodePtr->typePtr, nodePtr->syntax,
 					    valueObjPtr);
 		    if (! value) {
 			goto errorExit;
@@ -1663,7 +1663,7 @@ TnmSnmpNorm(Tcl_Interp *interp, Tcl_Obj *objPtr, int flags)
 	    }
 	    if (nodePtr) {
 		Tcl_Obj *scan;
-		scan = TnmMibScanValue(nodePtr->typePtr, nodePtr->syntax, 
+		scan = TnmMibScanValue(nodePtr->typePtr, nodePtr->syntax,
 				      valueObjPtr);
 		if (scan) {
 		    valueObjPtr = scan;
@@ -1681,7 +1681,7 @@ TnmSnmpNorm(Tcl_Interp *interp, Tcl_Obj *objPtr, int flags)
 	default:
 	    goto invalidType;
 	}
-	
+
 	Tcl_ListObjAppendElement(interp, vbPtr, valueObjPtr);
     }
 
@@ -1699,8 +1699,8 @@ TnmSnmpNorm(Tcl_Interp *interp, Tcl_Obj *objPtr, int flags)
  *
  * TnmSnmpSysUpTime --
  *
- *	This procedure returns the uptime of this SNMP enitity (agent) 
- *	in hundreds of seconds. Should be initialized when registering 
+ *	This procedure returns the uptime of this SNMP enitity (agent)
+ *	in hundreds of seconds. Should be initialized when registering
  *	the SNMP extension.
  *
  * Results:
@@ -1713,7 +1713,7 @@ TnmSnmpNorm(Tcl_Interp *interp, Tcl_Obj *objPtr, int flags)
  */
 
 int
-TnmSnmpSysUpTime()
+TnmSnmpSysUpTime(void)
 {
     static Tcl_Time bootTime = { 0, 0 };
     Tcl_Time currentTime;

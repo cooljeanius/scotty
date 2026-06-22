@@ -3,3 +3,5 @@ t*/configure.scan linguist-generated
 t*/tclconfig/config.guess linguist-vendored
 t*/tclconfig/config.sub linguist-vendored
 t*/tclconfig/install-sh linguist-vendored
+
+*.c whitespace=trailing-space

@@ -13,14 +13,14 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+# include <config.h>
+#endif /* HAVE_CONFIG_H */
 
 #include "tnmInt.h"
 
 #ifdef HAVE_SMI_H
-#include <smi.h>
-#endif
+# include <smi.h>
+#endif /* HAVE_CONFIG_H */
 
 #include "tnmMib.h"
 
@@ -28,10 +28,10 @@
  * Prototypes for procedures defined later in this file:
  */
 
-static void		
+static void
 DupOidInternalRep	(Tcl_Obj *srcPtr, Tcl_Obj *copyPtr);
 
-static void		
+static void
 FreeOidInternalRep	(Tcl_Obj *objPtr);
 
 static int
@@ -59,7 +59,7 @@ Tcl_ObjType tnmOidType = {
  *
  * TnmIsOid --
  *
- *	This procedure tests the given string, whether it consists 
+ *	This procedure tests the given string, whether it consists
  *	of dots and digits only.
  *
  * Results:
@@ -92,7 +92,7 @@ TnmIsOid(const char *string)
 	    return 0;
 	}
     }
-    
+
     return 1;
 }
 
@@ -101,8 +101,8 @@ TnmIsOid(const char *string)
  *
  * TnmHexToOid --
  *
- *	This procedure tests whether the string contains any 
- *	hexadecimal subidentifier and returns a new string with all 
+ *	This procedure tests whether the string contains any
+ *	hexadecimal subidentifier and returns a new string with all
  *	hex sub-identifier expanded.
  *
  * Results:
@@ -125,12 +125,12 @@ TnmHexToOid(const char *str)
 
     if (! str) return NULL;
 
-    /* 
-     * First test if the string contains any hexadecimal subidentifier 
+    /*
+     * First test if the string contains any hexadecimal subidentifier
      * indicated by ':' or '.0x' separators that should be converted
      * to integer subidentifiers.
      */
-    
+
     for (p = str; *p; p++) {
 	if ((p[0] == ':' && isdigit(p[1]))
 	    || (p[0] == '.' && p[1] == '0' && p[2] == 'x')) {
@@ -147,8 +147,8 @@ TnmHexToOid(const char *str)
      * Scan through the string and convert hexadecimal subidentifier
      * to integer subidentifier.
      */
-    
-    for (p = str, s = expstr; *p; ) { 
+
+    for (p = str, s = expstr; *p; ) {
 	convert = 0;
 	if ((p[0] == ':' && isdigit(p[1]))
 	    || (p[0] == '.' && p[1] == '0' && p[2] == 'x')) {
@@ -166,7 +166,7 @@ TnmHexToOid(const char *str)
 	}
     }
     *s = '\0';
-    
+
     return expstr;
 }
 
@@ -192,7 +192,7 @@ TnmOidInit(TnmOid *oidPtr)
     oidPtr->elements = oidPtr->staticSpace;
     oidPtr->length = 0;
     oidPtr->spaceAvl = TNM_OID_STATIC_SIZE;
-    memset((char *) oidPtr->staticSpace, 0, 
+    memset((char *) oidPtr->staticSpace, 0,
 	   (oidPtr->spaceAvl) * sizeof(u_int));
 }
 
@@ -254,7 +254,7 @@ TnmOidSetLength(TnmOid *oidPtr, int length)
     if (length > oidPtr->spaceAvl) {
 	int i, size;
 	u_int *dynamicSpace;
-	oidPtr->spaceAvl = ((length / TNM_OID_STATIC_SIZE) + 1) 
+	oidPtr->spaceAvl = ((length / TNM_OID_STATIC_SIZE) + 1)
 	    * TNM_OID_STATIC_SIZE;
 	size = (oidPtr->spaceAvl + 1) * sizeof(u_int);
 	dynamicSpace = (u_int *) ckalloc(size);
@@ -390,7 +390,7 @@ TnmOidFromString(TnmOid *oidPtr, const char *string)
 	    oidPtr->elements[i] = 10 * oidPtr->elements[i] + *c - '0';
 	} else {
 	    char x = *c & 0xff;
-	    int v = (x >= 'a') ?  x - 'a' + 10 
+	    int v = (x >= 'a') ?  x - 'a' + 10
 		: (x >= 'A' ? x - 'A' + 10 : x - '0');
 	    oidPtr->elements[i] = (oidPtr->elements[i] << 4) + v;
 	}
@@ -437,7 +437,7 @@ TnmOidToString(TnmOid *oidPtr)
     if (oidPtr == NULL) return NULL;
 
     buf[0] = '\0';
-    
+
     for (cp = buf, i = 0; i < oidPtr->length; i++) {
         if (oidPtr->elements[i] < 10) {
 	    *cp++ = '0' + oidPtr->elements[i];
@@ -454,7 +454,7 @@ TnmOidToString(TnmOid *oidPtr)
     if (cp > buf) {
 	*--cp = '\0';
     }
-    
+
     return buf;
 }
 
@@ -491,7 +491,7 @@ TnmOidCopy(TnmOid *dstOidPtr, TnmOid *srcOidPtr)
  *
  * TnmOidCompare --
  *
- *	This procedure compares two oids. 
+ *	This procedure compares two oids.
  *
  * Results:
  *	Returns -1, 0 or 1, depending on whether oid1 is less than,
@@ -504,9 +504,7 @@ TnmOidCopy(TnmOid *dstOidPtr, TnmOid *srcOidPtr)
  */
 
 int
-TnmOidCompare(oidPtr1, oidPtr2)
-    TnmOid *oidPtr1;
-    TnmOid *oidPtr2;
+TnmOidCompare(TnmOid *oidPtr1, TnmOid *oidPtr2)
 {
     int i;
 
@@ -531,7 +529,7 @@ TnmOidCompare(oidPtr1, oidPtr2)
  *
  * TnmOidInTree --
  *
- *	This procedure compares two oids. 
+ *	This procedure compares two oids.
  *
  * Results:
  *	Returns 0 or 1, depending on whether oid is in the subtree
@@ -576,7 +574,7 @@ TnmOidInTree(TnmOid *treePtr, TnmOid *oidPtr)
  *	interpreter, if interp is not NULL.
  *
  * Side effects:
- *	If the object is not already an tnmOidType, the conversion 
+ *	If the object is not already an tnmOidType, the conversion
  *	will free any old internal representation.
  *
  *----------------------------------------------------------------------
@@ -650,7 +648,7 @@ TnmNewOidObj(TnmOid *oidPtr)
  *
  * Side effects:
  *	The object's old string rep, if any, is freed. Also, any old
- *	internal rep is freed.  
+ *	internal rep is freed.
  *
  *----------------------------------------------------------------------
  */
@@ -668,7 +666,7 @@ TnmSetOidObj(Tcl_Obj *objPtr, TnmOid *oidPtr)
     if ((oldTypePtr != NULL) && (oldTypePtr->freeIntRepProc != NULL)) {
 	oldTypePtr->freeIntRepProc(objPtr);
     }
-    
+
     objPtr->internalRep.twoPtrValue.ptr1 = (VOID *) oidPtr;
     TnmOidObjSetRep(objPtr, TNM_OID_AS_OID);
     objPtr->typePtr = &tnmOidType;
@@ -738,7 +736,7 @@ DupOidInternalRep(srcPtr, copyPtr)
     for (i = 0; i < TnmOidGetLength(oidPtr); i++) {
 	TnmOidAppend(newOidPtr, TnmOidGet(oidPtr, i));
     }
-        
+
     copyPtr->internalRep.twoPtrValue.ptr1 = (VOID *) newOidPtr;
     copyPtr->internalRep.twoPtrValue.ptr2
 	= srcPtr->internalRep.twoPtrValue.ptr2;
@@ -820,7 +818,7 @@ errorExit:
 	Tcl_Free((char *) oidPtr);
     }
     return TCL_ERROR;
-}    
+}
 
 /*
  *----------------------------------------------------------------------

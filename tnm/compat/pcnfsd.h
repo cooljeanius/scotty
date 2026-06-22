@@ -501,7 +501,7 @@ extern v2_auth_results *pcnfsd2_auth_2();
 #define PCNFSD2_ALERT ((u_long)14)
 extern v2_alert_results *pcnfsd2_alert_2();
 #if RPC_SVC
- void msg_out(msg) char *msg; {_msgout(msg);}
+ void msg_out(char *msg) {_msgout(msg);}
 #endif
 #if 1
  extern void msg_out();

@@ -14,13 +14,13 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+# include <config.h>
+#endif /* HAVE_CONFIG_H */
 
 #include "tnmInt.h"
 #include "tnmPort.h"
 
-/* 
+/*
  * ToDo:	* check about `more' flag.
  *		* make better error return strings.
  */
@@ -89,13 +89,13 @@ static void
 NtpMakePkt	(struct ntp_control *pkt, int op,
 			     unsigned short assoc, unsigned short seq);
 static int
-NtpFetch	(Tcl_Interp *interp, struct sockaddr_in *daddr, 
+NtpFetch	(Tcl_Interp *interp, struct sockaddr_in *daddr,
 			     int op, int retries, int timeo,
 			     char *buf, unsigned short assoc);
 static int
 NtpSplit	(Tcl_Interp *interp, char *varname,
 			     char *pfix, char *buf);
-static int 
+static int
 NtpGetPeer	(char *data, int *assoc);
 
 /*
@@ -147,14 +147,14 @@ NtpSocket(Tcl_Interp *interp)
 {
     struct sockaddr_in maddr;
     int code;
-    
+
     if (sock != -1) {
 	TnmSocketClose(sock);
     }
 
     sock = TnmSocket(AF_INET, SOCK_DGRAM, 0);
     if (sock == TNM_SOCKET_ERROR) {
-	Tcl_AppendResult(interp, "could not create socket: ", 
+	Tcl_AppendResult(interp, "could not create socket: ",
 			 Tcl_PosixError(interp), (char *) NULL);
         return TCL_ERROR;
     }
@@ -192,18 +192,17 @@ NtpSocket(Tcl_Interp *interp)
  */
 
 static int
-NtpReady(s, timeout)
-    int s, timeout;
+NtpReady(int s, int timeout)
 {
     fd_set rfd;
     struct timeval tv;
     int rc;
-    
+
     FD_ZERO(&rfd);
     FD_SET(s, &rfd);
     tv.tv_sec = timeout / 1000;
     tv.tv_usec = (timeout % 1000) * 1000;
-    
+
     do {
 	rc = select(s + 1, &rfd, (fd_set *) 0, (fd_set *) 0, &tv);
 	if (rc == -1 && errno == EINTR) {
@@ -214,7 +213,7 @@ NtpReady(s, timeout)
 	    return 0;
 	}
     } while (rc < 0);
-    
+
     return rc > 0;
 }
 
@@ -245,10 +244,10 @@ NtpMakePkt(struct ntp_control *pkt, int op, unsigned short assoc, unsigned short
     pkt->offset = htons(0);
 
     if (! assoc) {
-	sprintf((char *) pkt->data, 
+	sprintf((char *) pkt->data,
 	      "precision,peer,system,stratum,rootdelay,rootdispersion,refid");
     } else  {
-	sprintf((char *) pkt->data, 
+	sprintf((char *) pkt->data,
 	      "srcadr,stratum,precision,reach,valid,delay,offset,dispersion");
     }
     pkt->len = htons((unsigned short) (strlen((char *) pkt->data)));
@@ -283,27 +282,27 @@ NtpFetch(Tcl_Interp *interp, struct sockaddr_in *daddr, int op, int retries, int
 
     static unsigned short seq = 1;			/* sequence number */
 
-    /* 
-     * increment to a new sequence number: 
+    /*
+     * increment to a new sequence number:
      */
 
     seq++;
-    
+
     for (i = 0; i < retries + 1; i++) {
 	NtpMakePkt(&qpkt, op, assoc, seq);		/* CTL_OP_READVAR */
 	memset((char *) &pkt, 0, sizeof(pkt));
-	
-	rc = TnmSocketSendTo(sock, (unsigned char *)&qpkt, sizeof(qpkt), 0, 
+
+	rc = TnmSocketSendTo(sock, (unsigned char *)&qpkt, sizeof(qpkt), 0,
 			     (struct sockaddr *) daddr, sizeof(*daddr));
 	if (rc == TNM_SOCKET_ERROR) {
 	    Tcl_AppendResult(interp, "udp sendto failed: ",
 			     Tcl_PosixError(interp), (char *) NULL);
 	    return TCL_ERROR;
 	}
-	
+
 	while (NtpReady(sock, timeout)) {
 	    memset((char *) &pkt, 0, sizeof(pkt));
-	    rc = TnmSocketRecvFrom(sock, (unsigned char *) &pkt, sizeof(pkt), 0, 
+	    rc = TnmSocketRecvFrom(sock, (unsigned char *) &pkt, sizeof(pkt), 0,
 				   (struct sockaddr *) &saddr, &slen);
 	    if (rc == TNM_SOCKET_ERROR) {
 		Tcl_AppendResult(interp, "recvfrom failed: ",
@@ -314,12 +313,12 @@ NtpFetch(Tcl_Interp *interp, struct sockaddr_in *daddr, int op, int retries, int
 	    /*
 	     * Ignore short packets < (ntp_control + 1 data byte)
 	     */
-	    
+
 	    if (rc < 12 + 1) {
 		continue;
 	    }
-	    
-	    if ((pkt.op & 0x80) 
+
+	    if ((pkt.op & 0x80)
 		&& saddr.sin_addr.s_addr == daddr->sin_addr.s_addr
 		&& saddr.sin_port == daddr->sin_port
 		&& pkt.sequence == qpkt.sequence)
@@ -329,7 +328,7 @@ NtpFetch(Tcl_Interp *interp, struct sockaddr_in *daddr, int op, int retries, int
 	    }
 	}
     }
-    
+
     Tcl_SetResult(interp, "no ntp response", TCL_STATIC);
     return TCL_ERROR;
 }
@@ -340,7 +339,7 @@ NtpFetch(Tcl_Interp *interp, struct sockaddr_in *daddr, int op, int retries, int
  * NtpSplit --
  *
  *	This procedure splits the result of an NTP query into pieces
- *	and set the Tcl array variable given by varname. An error message 
+ *	and set the Tcl array variable given by varname. An error message
  *	is left in the Tcl interpreter pointed to by interp.
  *
  * Results:
@@ -405,7 +404,7 @@ NtpSplit(Tcl_Interp *interp, char *varname, char *pfix, char *buf)
  *----------------------------------------------------------------------
  */
 
-static int 
+static int
 NtpGetPeer(char *data, int *assoc)
 {
     int i;
@@ -446,14 +445,14 @@ Tnm_NtpObjCmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *cons
     int actRetries = -1;	/* actually used retries */
     int actTimeout = -1;	/* actually used timeout */
 
-    NtpControl *control = (NtpControl *) 
+    NtpControl *control = (NtpControl *)
 	Tcl_GetAssocData(interp, tnmNtpControl, NULL);
 
     if (! control) {
 	control = (NtpControl *) ckalloc(sizeof(NtpControl));
 	control->retries = 2;
 	control->timeout = 2;
-	Tcl_SetAssocData(interp, tnmNtpControl, AssocDeleteProc, 
+	Tcl_SetAssocData(interp, tnmNtpControl, AssocDeleteProc,
 			 (ClientData) control);
     }
 
@@ -464,7 +463,7 @@ Tnm_NtpObjCmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *cons
 	return TCL_ERROR;
     }
 
-    /* 
+    /*
      * Parse the options:
      */
 
@@ -521,7 +520,7 @@ Tnm_NtpObjCmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *cons
     /*
      * Now we should have two arguments left: host and arrayName.
      */
-    
+
     if (x != objc-2) {
 	goto wrongArgs;
     }
@@ -530,7 +529,7 @@ Tnm_NtpObjCmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *cons
     actTimeout = actTimeout < 0 ? control->timeout : actTimeout;
 
     Tcl_MutexLock(&ntpMutex);
-    
+
     if (sock < 0) {
 	if (NtpSocket(interp) != TCL_OK) {
 	    Tcl_MutexUnlock(&ntpMutex);
@@ -544,7 +543,7 @@ Tnm_NtpObjCmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *cons
         return TCL_ERROR;
     }
     daddr.sin_port = htons(123);
-    
+
     /*
      * CTL_OP_READVAR
      */
@@ -555,9 +554,9 @@ Tnm_NtpObjCmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *cons
 	Tcl_MutexUnlock(&ntpMutex);
 	return TCL_ERROR;
     }
-    
+
     /*
-     * Try to get additional info: 
+     * Try to get additional info:
      */
 
     if (NtpGetPeer(data1, &assoc)) {

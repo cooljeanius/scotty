@@ -13,8 +13,8 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+# include <config.h>
+#endif /* HAVE_CONFIG_H */
 
 #include "tnmInt.h"
 #include "tnmPort.h"
@@ -31,7 +31,7 @@ TCL_DECLARE_MUTEX(utilMutex)
  *
  * TnmGetTableValue --
  *
- *	This procedure searches for a key in a given table and 
+ *	This procedure searches for a key in a given table and
  *	returns the corresponding value.
  *
  * Results:
@@ -90,7 +90,7 @@ TnmGetTableKey(TnmTable *table, const char *value)
 	    }
 	}
     }
-    
+
     return -1;
 }
 
@@ -130,7 +130,7 @@ TnmGetTableValues(TnmTable *table)
     }
 
     /*
-     * First count the number of bytes that we need to build 
+     * First count the number of bytes that we need to build
      * the result string and make sure that the buffer is long
      * enough to hold the result.
      */
@@ -149,7 +149,7 @@ TnmGetTableValues(TnmTable *table)
     /*
      * Build the result string.
      */
-    
+
     p = buffer;
     if (table) {
 	for (elemPtr = table; elemPtr->value; elemPtr++) {
@@ -172,7 +172,7 @@ TnmGetTableValues(TnmTable *table)
     *p = '\0';
 
     Tcl_MutexUnlock(&utilMutex);
-    
+
     return buffer;
 }
 
@@ -199,7 +199,7 @@ TnmListFromTable(TnmTable *table, Tcl_Obj *listPtr, char *pattern)
     for (; table->value; table++) {
 	if (pattern && !Tcl_StringMatch(table->value, pattern)) {
 	    continue;
-	}	
+	}
 	Tcl_ListObjAppendElement((Tcl_Interp *) NULL, listPtr,
 				 Tcl_NewStringObj(table->value, -1));
     }
@@ -267,12 +267,12 @@ TnmListFromList(Tcl_Obj *objPtr, Tcl_Obj *listPtr, char *pattern)
 
     code = Tcl_ListObjGetElements(NULL, objPtr, &objc, &objv);
     if (code != TCL_OK) return;
-    
+
     for (i = 0; i < objc; i++) {
 	char *s = Tcl_GetStringFromObj(objv[i], NULL);
 	if (pattern && !Tcl_StringMatch(s, pattern)) {
 	    continue;
-	}	
+	}
 	Tcl_ListObjAppendElement((Tcl_Interp *) NULL, listPtr, objv[i]);
     }
 }
@@ -310,7 +310,7 @@ TnmSetConfig(Tcl_Interp *interp, TnmConfig *config, ClientData object, int objc,
 
     /*
      * First scan through the list of options to make sure that
-     * we don't run on an unknown option later when we have 
+     * we don't run on an unknown option later when we have
      * already modified the object.
      */
 
@@ -327,7 +327,7 @@ TnmSetConfig(Tcl_Interp *interp, TnmConfig *config, ClientData object, int objc,
      * this version does not rollback changes so an object might
      * end up in a half modified state.
      */
-	
+
     for (i = 2; i < objc; i += 2) {
 	option = TnmGetTableKeyFromObj(interp, config->optionTable,
 				       objv[i], "option");
@@ -346,7 +346,7 @@ TnmSetConfig(Tcl_Interp *interp, TnmConfig *config, ClientData object, int objc,
     for (elemPtr = config->optionTable; elemPtr->value; elemPtr++) {
 	objPtr = (config->getOption)(interp, object, (int) elemPtr->key);
 	if (objPtr) {
-	    Tcl_ListObjAppendElement(interp, listPtr, 
+	    Tcl_ListObjAppendElement(interp, listPtr,
 				     Tcl_NewStringObj(elemPtr->value, -1));
 	    Tcl_ListObjAppendElement(interp, listPtr, objPtr);
 	}
@@ -383,7 +383,7 @@ TnmGetConfig(Tcl_Interp *interp, TnmConfig *config, ClientData object, int objc,
 	return TCL_ERROR;
     }
 
-    option = TnmGetTableKeyFromObj(interp, config->optionTable, 
+    option = TnmGetTableKeyFromObj(interp, config->optionTable,
 				   objv[2], "option");
     if (option < 0) {
 	return TCL_ERROR;
@@ -392,8 +392,8 @@ TnmGetConfig(Tcl_Interp *interp, TnmConfig *config, ClientData object, int objc,
     objPtr = (config->getOption)(interp, object, option);
     if (! objPtr) {
 	Tcl_ResetResult(interp);
-	Tcl_AppendResult(interp, "invalid option \"", 
-			 Tcl_GetStringFromObj(objv[2], NULL), "\"", 
+	Tcl_AppendResult(interp, "invalid option \"",
+			 Tcl_GetStringFromObj(objv[2], NULL), "\"",
 			 (char *) NULL);
 	return TCL_ERROR;
     }
@@ -424,7 +424,7 @@ TnmVectorInit(TnmVector *vPtr)
     vPtr->elements = vPtr->staticSpace;
     vPtr->size = 0;
     vPtr->spaceAvl = TNM_VECTOR_STATIC_SIZE;
-    memset((char *) vPtr->staticSpace, 0, 
+    memset((char *) vPtr->staticSpace, 0,
 	   (vPtr->spaceAvl + 1) * sizeof(ClientData));
 }
 
@@ -454,7 +454,7 @@ TnmVectorFree(TnmVector *vPtr)
     vPtr->elements = vPtr->staticSpace;
     vPtr->size = 0;
     vPtr->spaceAvl = TNM_VECTOR_STATIC_SIZE;
-    memset((char *) vPtr->staticSpace, 0, 
+    memset((char *) vPtr->staticSpace, 0,
 	   (vPtr->spaceAvl + 1) * sizeof(ClientData));
 }
 
@@ -539,7 +539,7 @@ TnmVectorDelete(TnmVector *vPtr, ClientData clientData)
  *
  * TnmGetUnsigned --
  *
- *	This procedure converts a string into an unsigned integer 
+ *	This procedure converts a string into an unsigned integer
  *	value. This is simply Tcl_GetInt() with an additional check.
  *
  * Results:
@@ -572,7 +572,7 @@ TnmGetUnsigned(Tcl_Interp *interp, char *string, int *intPtr)
  *
  * TnmGetUnsignedFromObj --
  *
- *	This procedure converts an object into an unsigned integer 
+ *	This procedure converts an object into an unsigned integer
  *	value. This is simply Tcl_GetIntFromObj() with an additional
  *	check.
  *
@@ -594,7 +594,7 @@ TnmGetUnsignedFromObj(Tcl_Interp *interp, Tcl_Obj *objPtr, int *intPtr)
     if (code != TCL_OK || *intPtr < 0) {
 	Tcl_ResetResult(interp);
 	Tcl_AppendResult(interp, "expected unsigned integer but got \"",
-			 Tcl_GetStringFromObj(objPtr, NULL), "\"", 
+			 Tcl_GetStringFromObj(objPtr, NULL), "\"",
 			 (char *) NULL);
 	return TCL_ERROR;
     }
@@ -607,7 +607,7 @@ TnmGetUnsignedFromObj(Tcl_Interp *interp, Tcl_Obj *objPtr, int *intPtr)
  *
  * TnmGetPositive --
  *
- *	This procedure converts a string into a positive integer 
+ *	This procedure converts a string into a positive integer
  *	value. This is simply Tcl_GetInt() with an additional check.
  *
  * Results:
@@ -640,7 +640,7 @@ TnmGetPositive(Tcl_Interp *interp, char *string, int *intPtr)
  *
  * TnmGetPositiveFromObj --
  *
- *	This procedure converts a string into a positive integer 
+ *	This procedure converts a string into a positive integer
  *	value. This is simply Tcl_GetIntFromObj() with an additional
  *	check.
  *
@@ -674,7 +674,7 @@ TnmGetPositiveFromObj(Tcl_Interp *interp, Tcl_Obj *objPtr, int *intPtr)
  *
  * TnmGetIntRangeFromObj --
  *
- *	This procedure converts a string into an integer value and 
+ *	This procedure converts a string into an integer value and
  *	checks whether the value is in the given range. This is simply
  *	Tcl_GetIntFromObj() with an additional check.
  *
@@ -733,7 +733,7 @@ TnmPrintCounter64(u_int high, u_int low)
     static char first[30];
 
     Tcl_MutexLock(&utilMutex);
-    
+
     if (high == 0) {
 	sprintf(first, "%u", low);
 	Tcl_MutexUnlock(&utilMutex);
@@ -741,7 +741,7 @@ TnmPrintCounter64(u_int high, u_int low)
     }
 
     d = high * 4294967296.0;	/* 2^32 */
-    if (high <= 0x1fffff) { 
+    if (high <= 0x1fffff) {
 	d += low;
 	sprintf(first, "%.0f", d);
 	Tcl_MutexUnlock(&utilMutex);
@@ -780,7 +780,7 @@ TnmPrintCounter64(u_int high, u_int low)
  *	reduce the overall DNS overhead.
  *
  * Results:
- *	A standard TCL result. This procedure leaves an error message 
+ *	A standard TCL result. This procedure leaves an error message
  *	in interp->result if interp is not NULL.
  *
  * Side effects:
@@ -839,7 +839,7 @@ TnmSetIPAddress(Tcl_Interp *interp, const char *host, struct sockaddr_in *addr)
 	if (hostaddr == -1 && strcmp(host, "255.255.255.255") != 0) {
 	    if (interp) {
 		Tcl_ResetResult(interp);
-		Tcl_AppendResult(interp, "invalid IP address \"", 
+		Tcl_AppendResult(interp, "invalid IP address \"",
 				 host, "\"", (char *) NULL);
 	    }
 	    Tcl_MutexUnlock(&utilMutex);
@@ -873,7 +873,7 @@ TnmSetIPAddress(Tcl_Interp *interp, const char *host, struct sockaddr_in *addr)
 	if (! hp) {
 	    if (interp) {
 		Tcl_ResetResult(interp);
-		Tcl_AppendResult(interp, "unknown IP host name \"", 
+		Tcl_AppendResult(interp, "unknown IP host name \"",
 				 host, "\"", (char *) NULL);
 	    }
 	    Tcl_MutexUnlock(&utilMutex);
@@ -937,7 +937,7 @@ TnmGetIPName(Tcl_Interp *interp, struct sockaddr_in *addr)
 	Tcl_MutexUnlock(&utilMutex);
 	return (char *) Tcl_GetHashValue(hostEntry);
     }
-    
+
     host = gethostbyaddr((char *) &addr->sin_addr, 4, AF_INET);
     if (host) {
 	int isnew;
@@ -952,7 +952,7 @@ TnmGetIPName(Tcl_Interp *interp, struct sockaddr_in *addr)
 
     if (interp) {
 	Tcl_ResetResult(interp);
-	Tcl_AppendResult(interp, "unknown IP address \"", 
+	Tcl_AppendResult(interp, "unknown IP address \"",
 			 inet_ntoa(addr->sin_addr), "\"", (char *) NULL);
     }
     Tcl_MutexUnlock(&utilMutex);
@@ -968,7 +968,7 @@ TnmGetIPName(Tcl_Interp *interp, struct sockaddr_in *addr)
  *	and writes the port into the socket address structure.
  *
  * Results:
- *	A standard TCL result. This procedure leaves an error message 
+ *	A standard TCL result. This procedure leaves an error message
  *	in interp->result if interp is not NULL.
  *
  * Side effects:
@@ -986,7 +986,7 @@ TnmSetIPPort(Tcl_Interp *interp, char *protocol, char *port, struct sockaddr_in*
     if (strcmp(protocol, "udp") != 0 && strcmp(protocol, "tcp") != 0) {
 	if (interp) {
 	    Tcl_ResetResult(interp);
-	    Tcl_AppendResult(interp, "unknown IP protocol \"", 
+	    Tcl_AppendResult(interp, "unknown IP protocol \"",
 			     protocol, "\"", (char *) NULL);
 	}
 	return TCL_ERROR;
@@ -1012,7 +1012,7 @@ TnmSetIPPort(Tcl_Interp *interp, char *protocol, char *port, struct sockaddr_in*
 
     if (interp) {
 	Tcl_ResetResult(interp);
-	Tcl_AppendResult(interp, "unknown ", protocol, " port \"", 
+	Tcl_AppendResult(interp, "unknown ", protocol, " port \"",
 			 port, "\"", (char *) NULL);
     }
     return TCL_ERROR;
@@ -1045,7 +1045,7 @@ TnmGetIPPort(Tcl_Interp *interp, char *protocol, struct sockaddr_in *addr)
     if (strcmp(protocol, "udp") != 0 && strcmp(protocol, "tcp") != 0) {
 	if (interp) {
 	    Tcl_ResetResult(interp);
-	    Tcl_AppendResult(interp, "unknown IP protocol \"", 
+	    Tcl_AppendResult(interp, "unknown IP protocol \"",
 			     protocol, "\"", (char *) NULL);
 	}
 	return NULL;
@@ -1057,7 +1057,7 @@ TnmGetIPPort(Tcl_Interp *interp, char *protocol, struct sockaddr_in *addr)
 	sprintf(buffer, "%d", ntohs(addr->sin_port));
 	if (interp) {
 	    Tcl_ResetResult(interp);
-	    Tcl_AppendResult(interp, "unknown ", protocol, " port \"", 
+	    Tcl_AppendResult(interp, "unknown ", protocol, " port \"",
 			     buffer, "\"", (char *) NULL);
 	}
 	return NULL;
@@ -1186,7 +1186,7 @@ TnmValidateIpAddress(Tcl_Interp *interp, const char *address)
  *
  * TnmWriteMessage --
  *
- *	This procedure writes a message to the error channel. This 
+ *	This procedure writes a message to the error channel. This
  *	should only be used in situations where there is not better
  *	way to handle the run-time error in Tcl.
  *
@@ -1357,7 +1357,7 @@ TnmAttrDump(Tcl_HashTable *tablePtr, char *name, Tcl_DString *dsPtr)
     Tcl_HashEntry *entryPtr;
     Tcl_HashSearch search;
     char *key, *value;
-    
+
     entryPtr = Tcl_FirstHashEntry(tablePtr, &search);
     while (entryPtr != NULL) {
 	key = Tcl_GetHashKey(tablePtr, entryPtr);
@@ -1427,10 +1427,7 @@ TnmHexEnc(char *s, int n, char *d)
  */
 
 int
-TnmHexDec(s, d, n)
-    const char *s;
-    char *d;
-    int *n;
+TnmHexDec(const char *s, char *d, int *n)
 {
     int v;
     char c;
@@ -1461,7 +1458,7 @@ TnmHexDec(s, d, n)
  *
  * TnmGetHandle --
  *
- *	This procedure creates a handle for an object which is 
+ *	This procedure creates a handle for an object which is
  *	represented by a Tcl command. This procedure ensures that
  *	the name is currently unused.
  *
@@ -1581,7 +1578,7 @@ TnmMkDir(Tcl_Interp *interp, Tcl_Obj *obj)
 
 	target = Tcl_FSJoinPath(split, j + 1);
 	Tcl_IncrRefCount(target);
-	
+
 	/*
 	 * Call TnmStat() so that if target is a symlink that points
 	 * to a directory we will create subdirectories in that
@@ -1619,7 +1616,7 @@ TnmMkDir(Tcl_Interp *interp, Tcl_Obj *obj)
     if (target != NULL) {
 	Tcl_DecrRefCount(target);
     }
-    
+
     return result;
 }
 

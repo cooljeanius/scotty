@@ -1,9 +1,9 @@
 /*
  * scotty.c --
  *
- *	This is scotty, a simple event-driven Tcl interpreter with 
+ *	This is scotty, a simple event-driven Tcl interpreter with
  *	some special commands to get network management information
- *	about TCP/IP networks. 
+ *	about TCP/IP networks.
  *
  * Copyright (c) 1993-1996 Technical University of Braunschweig.
  * Copyright (c) 1996-1997 University of Twente.
@@ -19,8 +19,8 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+# include <config.h>
+#endif /* HAVE_CONFIG_H */
 
 #include <tcl.h>
 #include "tnm.h"
@@ -78,14 +78,14 @@ Tcl_AppInit(Tcl_Interp *interp)
     if ((Tcl_Init)(interp) == TCL_ERROR) {
         return TCL_ERROR;
     }
-    
+
     if (Tcl_InitStubs(interp, "8.1", 0) == NULL) {
 	return TCL_ERROR;
     }
     if (Tcl_PkgRequire(interp, "Tcl", "8.1", 0) == NULL) {
 	return TCL_ERROR;
     }
-    
+
     if (Tcl_PkgRequire(interp, "Tnm", TNM_VERSION, 1) == NULL) {
 	if (Tcl_StringMatch(Tcl_GetStringResult(interp), "*can't find package*")) {
 	    Tcl_AppendResult(interp, "\n",
@@ -108,9 +108,10 @@ Tcl_AppInit(Tcl_Interp *interp)
 }
 
 int
-main(argc, argv)
-    int argc;			/* Number of command-line arguments. */
-    char **argv;		/* Values of command-line arguments. */
+main (
+    int argc,			/* Number of command-line arguments. */
+    char **argv			/* Values of command-line arguments. */
+)
 {
     /*
      * The following #if block allows you to change the AppInit
@@ -120,7 +121,7 @@ main(argc, argv)
      */
 
 #ifndef TCL_LOCAL_APPINIT
-#define TCL_LOCAL_APPINIT Tcl_AppInit    
+#define TCL_LOCAL_APPINIT Tcl_AppInit
 #endif
     extern int TCL_LOCAL_APPINIT (Tcl_Interp *interp);
 

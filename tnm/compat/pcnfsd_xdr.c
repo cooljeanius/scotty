@@ -837,7 +837,7 @@ xdr_v2_alert_results(XDR *xdrs, v2_alert_results *objp)
 	return (TRUE);
 }
 #if RPC_SVC
- void msg_out(msg) char *msg; {_msgout(msg);}
+ void msg_out(char *msg) {_msgout(msg);}
 #endif
 #if RPC_HDR
  extern void msg_out();
