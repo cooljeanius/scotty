@@ -69,7 +69,7 @@ jobs:
           fi
       - name: Build
         run: |
-          cd tnm
+          cd tnm && pwd
           if [[ "${{ runner.os }}" == "Linux" ]]; then \
             if test -e miniconda_build.txt; then \
               stat compat; \
@@ -115,6 +115,7 @@ jobs:
             echo "(end of file listing output)"; \
           fi
           echo "whoami? $(whoami)"
+          find . -name mount_clnt.c -print0 | xargs -0 cat
           sleep 1
     strategy:
       fail-fast: false
