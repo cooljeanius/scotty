@@ -78,7 +78,7 @@ jobs:
               make CFLAGS="-Wno-error=implicit-function-declaration -Wno-attributes -I/usr/include/tirpc -fPIC"; \
             fi; \
           else \
-            make CFLAGS="-Wno-error=implicit-function-declaration -Wno-error=incompatible-function-pointer-types -Wno-attributes"; \
+            make -w CFLAGS="-Wno-error=implicit-function-declaration -Wno-error=incompatible-function-pointer-types -Wno-attributes"; \
           fi
       - name: Install 1
         shell: bash
