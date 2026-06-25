@@ -66,7 +66,7 @@ static char*
 TraceAgentTime		(ClientData clientData,
 				     Tcl_Interp *interp,
 				     char *name1, char *name2, int flags);
-#endif
+#endif /* TNM_SNMPv2U */
 
 static char*
 TraceUnsignedInt	(ClientData clientData,
@@ -328,12 +328,7 @@ CacheClear(TnmSnmp *session)
  */
 
 static char*
-TraceSysUpTime(clientData, interp, name1, name2, flags)
-    ClientData clientData;
-    Tcl_Interp *interp;
-    char *name1;
-    char *name2;
-    int flags;
+TraceSysUpTime(ClientData clientData, Tcl_Interp *interp, char *name1, char *name2, int flags)
 {
     char buf[20];
     sprintf(buf, "%u", TnmSnmpSysUpTime());
@@ -360,19 +355,14 @@ TraceSysUpTime(clientData, interp, name1, name2, flags)
  */
 
 static char*
-TraceAgentTime(clientData, interp, name1, name2, flags)
-    ClientData clientData;
-    Tcl_Interp *interp;
-    char *name1;
-    char *name2;
-    int flags;
+TraceAgentTime(ClientData clientData, Tcl_Interp *interp, char *name1, char *name2, int flags)
 {
     char buf[20];
     sprintf(buf, "%u", TnmSnmpSysUpTime() / 100);
     Tcl_SetVar2(interp, name1, name2, buf, TCL_GLOBAL_ONLY);
     return NULL;
 }
-#endif
+#endif /* TNM_SNMPv2U */
 
 /*
  *----------------------------------------------------------------------
@@ -393,12 +383,7 @@ TraceAgentTime(clientData, interp, name1, name2, flags)
  */
 
 static char*
-TraceUnsignedInt(clientData, interp, name1, name2, flags)
-    ClientData clientData;
-    Tcl_Interp *interp;
-    char *name1;
-    char *name2;
-    int flags;
+TraceUnsignedInt(ClientData clientData, Tcl_Interp *interp, char *name1, char *name2, int flags)
 {
     char buf[20];
     sprintf(buf, "%u", *(unsigned *) clientData);
@@ -491,7 +476,7 @@ TnmSnmpAgentInit(Tcl_Interp *interp, TnmSnmp *session)
     session->agentTime = time((time_t *) NULL);
     session->agentBoots = session->agentTime - 820454400;
     TnmSnmpUsecSetAgentID(session);
-#endif
+#endif /* TNM_SNMPv2U */
 
     strcpy(buffer, "Tnm SNMP agent");
     value = Tcl_GetVar2(interp, "tnm", "version", TCL_GLOBAL_ONLY);
@@ -540,7 +525,7 @@ TnmSnmpAgentInit(Tcl_Interp *interp, TnmSnmp *session)
 		      (Tcl_VarTraceProc *) TraceUnsignedInt, (ClientData) p->value);
     }
 
-    /* XXX snmpEnableAuthenTraps.0 should be implemented */
+    /* XXX: snmpEnableAuthenTraps.0 should be implemented */
 
 #ifdef TNM_SNMPv2U
     TnmHexEnc((char *) session->agentID, USEC_MAX_AGENTID, buffer);
@@ -553,7 +538,7 @@ TnmSnmpAgentInit(Tcl_Interp *interp, TnmSnmp *session)
 		  TraceAgentTime, (ClientData) NULL);
     sprintf(buffer, "%d", session->maxSize);
     TnmSnmpCreateNode(interp, "agentSize.0", "tnm_usec(agentSize)", buffer);
-#endif
+#endif /* TNM_SNMPv2U */
 
     Tcl_ResetResult(interp);
     return TCL_OK;
