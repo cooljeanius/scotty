@@ -691,8 +691,9 @@ TnmSetOidObj(Tcl_Obj *objPtr, TnmOid *oidPtr)
  */
 
 static void
-FreeOidInternalRep(objPtr)
-    Tcl_Obj *objPtr;		/* Object with internal rep to free. */
+FreeOidInternalRep (
+    Tcl_Obj *objPtr		/* Object with internal rep to free. */
+)
 {
     TnmOid *oidPtr = (TnmOid *) objPtr->internalRep.twoPtrValue.ptr1;
     if (oidPtr) {
@@ -723,9 +724,10 @@ FreeOidInternalRep(objPtr)
  */
 
 static void
-DupOidInternalRep(srcPtr, copyPtr)
-    Tcl_Obj *srcPtr;		/* Object with internal rep to copy. */
-    Tcl_Obj *copyPtr;		/* Object with internal rep to set. */
+DupOidInternalRep (
+    Tcl_Obj *srcPtr,		/* Object with internal rep to copy. */
+    Tcl_Obj *copyPtr		/* Object with internal rep to set. */
+)
 {
     TnmOid *oidPtr = (TnmOid *) srcPtr->internalRep.twoPtrValue.ptr1;
     TnmOid *newOidPtr;
@@ -764,9 +766,10 @@ DupOidInternalRep(srcPtr, copyPtr)
  */
 
 static int
-SetOidFromAny(interp, objPtr)
-    Tcl_Interp *interp;		/* Used for error reporting if not NULL. */
-    Tcl_Obj *objPtr;		/* The object to convert. */
+SetOidFromAny (
+    Tcl_Interp *interp,		/* Used for error reporting if not NULL. */
+    Tcl_Obj *objPtr 		/* The object to convert. */
+)
 {
     const Tcl_ObjType *oldTypePtr = objPtr->typePtr;
     char *string;
@@ -878,7 +881,7 @@ UpdateStringOfOid(Tcl_Obj *objPtr)
 	    strcat(objPtr->bytes, "::");
 #else
 	    strcat(objPtr->bytes, "!");
-#endif
+#endif /* 1 || 0 */
 	    strcat(objPtr->bytes, nodePtr->label);
 	} else {
 	    strcpy(objPtr->bytes, nodePtr->label);
@@ -894,4 +897,3 @@ UpdateStringOfOid(Tcl_Obj *objPtr)
  * compile-command: "make -k -C ../../unix"
  * End:
  */
-
