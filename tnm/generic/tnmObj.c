@@ -289,9 +289,10 @@ FreeUnsigned64InternalRep (
  */
 
 static void
-DupUnsigned64InternalRep(srcPtr, copyPtr)
-    Tcl_Obj *srcPtr;		/* Object with internal rep to copy. */
-    Tcl_Obj *copyPtr;		/* Object with internal rep to set. */
+DupUnsigned64InternalRep (
+    Tcl_Obj *srcPtr,		/* Object with internal rep to copy. */
+    Tcl_Obj *copyPtr		/* Object with internal rep to set. */
+)
 {
     copyPtr->internalRep.otherValuePtr
 	= (VOID *) Tcl_Alloc(sizeof(TnmUnsigned64));
@@ -346,9 +347,10 @@ UpdateStringOfUnsigned64(Tcl_Obj *objPtr)
  */
 
 static int
-SetUnsigned64FromAny(interp, objPtr)
-    Tcl_Interp *interp;		/* Used for error reporting if not NULL. */
-    Tcl_Obj *objPtr;		/* The object to convert. */
+SetUnsigned64FromAny (
+    Tcl_Interp *interp,		/* Used for error reporting if not NULL. */
+    Tcl_Obj *objPtr			/* The object to convert. */
+)
 {
     const Tcl_ObjType *oldTypePtr = objPtr->typePtr;
     char *string, *p;
@@ -526,9 +528,10 @@ TnmGetUnsigned32FromObj(Tcl_Interp *interp, Tcl_Obj *objPtr, TnmUnsigned32 *uPtr
  */
 
 static void
-DupUnsigned32InternalRep(srcPtr, copyPtr)
-    Tcl_Obj *srcPtr;		/* Object with internal rep to copy. */
-    Tcl_Obj *copyPtr;		/* Object with internal rep to set. */
+DupUnsigned32InternalRep (
+    Tcl_Obj *srcPtr,		/* Object with internal rep to copy. */
+    Tcl_Obj *copyPtr		/* Object with internal rep to set. */
+)
 {
     copyPtr->internalRep.longValue = srcPtr->internalRep.longValue;
     copyPtr->typePtr = &tnmUnsigned32Type;
@@ -580,9 +583,10 @@ UpdateStringOfUnsigned32(Tcl_Obj *objPtr)
  */
 
 static int
-SetUnsigned32FromAny(interp, objPtr)
-    Tcl_Interp *interp;		/* Used for error reporting if not NULL. */
-    Tcl_Obj *objPtr;		/* The object to convert. */
+SetUnsigned32FromAny (
+    Tcl_Interp *interp,		/* Used for error reporting if not NULL. */
+    Tcl_Obj *objPtr			/* The object to convert. */
+)
 {
     const Tcl_ObjType *oldTypePtr = objPtr->typePtr;
     char *string, *end, *p;
@@ -781,8 +785,9 @@ TnmGetOctetStringFromObj(Tcl_Interp *interp, Tcl_Obj *objPtr, int *lengthPtr)
  */
 
 static void
-FreeOctetStringInternalRep(objPtr)
-    Tcl_Obj *objPtr;		/* Object with internal rep to free. */
+FreeOctetStringInternalRep (
+    Tcl_Obj *objPtr		/* Object with internal rep to free. */
+)
 {
     if (objPtr->internalRep.twoPtrValue.ptr1) {
 	Tcl_Free((char *) objPtr->internalRep.twoPtrValue.ptr1);
@@ -809,9 +814,10 @@ FreeOctetStringInternalRep(objPtr)
  */
 
 static void
-DupOctetStringInternalRep(srcPtr, copyPtr)
-    Tcl_Obj *srcPtr;		/* Object with internal rep to copy. */
-    Tcl_Obj *copyPtr;		/* Object with internal rep to set. */
+DupOctetStringInternalRep (
+    Tcl_Obj *srcPtr,		/* Object with internal rep to copy. */
+    Tcl_Obj *copyPtr		/* Object with internal rep to set. */
+)
 {
     size_t size = (int) srcPtr->internalRep.twoPtrValue.ptr2;
     char *bytes;
@@ -872,9 +878,10 @@ UpdateStringOfOctetString(Tcl_Obj *objPtr)
  */
 
 static int
-SetOctetStringFromAny(interp, objPtr)
-    Tcl_Interp *interp;		/* Used for error reporting if not NULL. */
-    Tcl_Obj *objPtr;		/* The object to convert. */
+SetOctetStringFromAny (
+    Tcl_Interp *interp,		/* Used for error reporting if not NULL. */
+    Tcl_Obj *objPtr 		/* The object to convert. */
+)
 {
     const Tcl_ObjType *oldTypePtr = objPtr->typePtr;
     char *string, *bytes;
@@ -1041,9 +1048,10 @@ TnmGetIpAddressFromObj(Tcl_Interp *interp, Tcl_Obj *objPtr)
  */
 
 static void
-DupIpAddressInternalRep(srcPtr, copyPtr)
-    Tcl_Obj *srcPtr;		/* Object with internal rep to copy. */
-    Tcl_Obj *copyPtr;		/* Object with internal rep to set. */
+DupIpAddressInternalRep (
+    Tcl_Obj *srcPtr,		/* Object with internal rep to copy. */
+    Tcl_Obj *copyPtr		/* Object with internal rep to set. */
+)
 {
     copyPtr->internalRep.longValue = srcPtr->internalRep.longValue;
     copyPtr->typePtr = &tnmIpAddressType;
@@ -1097,9 +1105,10 @@ UpdateStringOfIpAddress(Tcl_Obj *objPtr)
  */
 
 static int
-SetIpAddressFromAny(interp, objPtr)
-    Tcl_Interp *interp;		/* Used for error reporting if not NULL. */
-    Tcl_Obj *objPtr;		/* The object to convert. */
+SetIpAddressFromAny (
+    Tcl_Interp *interp,		/* Used for error reporting if not NULL. */
+    Tcl_Obj *objPtr 		/* The object to convert. */
+)
 {
     const Tcl_ObjType *oldTypePtr = objPtr->typePtr;
     char *string;
