@@ -66,13 +66,15 @@ AC_CHECK_SIZEOF([unsigned long long])dnl
 #	$srcdir/../compat/.
 #----------------------------------------------------------------------------
 
-AC_CHECK_PROG([RPCGEN],[rpcgen],[rpcgen],[echo])
+AC_PATH_PROG([RPCGEN],[rpcgen],[echo])
 if test "x${RPCGEN}" = "xecho"; then
     AC_MSG_WARN([Failed to find rpcgen. Will use precompiled files.])
     cp ${srcdir}/../compat/ether* .
     cp ${srcdir}/../compat/mount* .
     cp ${srcdir}/../compat/pcnfsd* .
     cp ${srcdir}/../compat/rstat* .
+elif test -x "${RPCGEN}"; then
+    ${RPCGEN} --version
 fi
 
 #----------------------------------------------------------------------------
