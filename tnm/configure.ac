@@ -74,7 +74,7 @@ if test "x${RPCGEN}" = "xecho"; then
     cp ${srcdir}/../compat/pcnfsd* .
     cp ${srcdir}/../compat/rstat* .
 elif test -x "${RPCGEN}"; then
-    ${RPCGEN} --version
+    which -a rpcgen
 fi
 
 #----------------------------------------------------------------------------

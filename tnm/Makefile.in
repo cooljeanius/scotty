@@ -218,16 +218,16 @@ PKG_LIBS	= @PKG_LIBS@
 # building output from input in the same directory.
 ether.h:	$(TNM_GENERIC_DIR)/ether.x
 	cp $(TNM_GENERIC_DIR)/${@:.h=.x}  .
-	$(RPCGEN) ${@:.h=.x}
+	$(RPCGEN) -C ${@:.h=.x}
 mount.h:	$(TNM_GENERIC_DIR)/mount.x
 	cp $(TNM_GENERIC_DIR)/${@:.h=.x}  .
-	$(RPCGEN) ${@:.h=.x}
+	$(RPCGEN) -C ${@:.h=.x}
 pcnfsd.h:	$(TNM_GENERIC_DIR)/pcnfsd.x
 	cp $(TNM_GENERIC_DIR)/${@:.h=.x}  .
-	$(RPCGEN) ${@:.h=.x}
+	$(RPCGEN) -C ${@:.h=.x}
 rstat.h:	$(TNM_GENERIC_DIR)/rstat.x
 	cp $(TNM_GENERIC_DIR)/${@:.h=.x}  .
-	$(RPCGEN) ${@:.h=.x}
+	$(RPCGEN) -C ${@:.h=.x}
 
 ether_clnt.c ether_xdr.c	: ether.h
 mount_clnt.c mount_xdr.c	: mount.h
