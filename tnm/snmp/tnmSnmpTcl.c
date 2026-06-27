@@ -17,15 +17,15 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+# include <config.h>
+#endif /* HAVE_CONFIG_H */
 
 #include "tnmSnmp.h"
 #include "tnmMib.h"
 
 #if !defined(Tcl_GetErrorLine)
-#define Tcl_GetErrorLine(interp) (interp->errorLine)
-#endif
+# define Tcl_GetErrorLine(interp) (interp->errorLine)
+#endif /* !Tcl_GetErrorLine */
 
 /*
  * The global variable TnmSnmp list contains all existing
@@ -65,16 +65,16 @@ static void
 PduFree		(TnmSnmpPdu *pduPtr);
 
 static Tcl_Obj*
-GetOption	(Tcl_Interp *interp, ClientData object, 
+GetOption	(Tcl_Interp *interp, ClientData object,
 			     int option);
 static int
-SetOption	(Tcl_Interp *interp, ClientData object, 
+SetOption	(Tcl_Interp *interp, ClientData object,
 			     int option, Tcl_Obj *objPtr);
 static int
 BindEvent	(Tcl_Interp *interp, TnmSnmp *session,
 			     Tcl_Obj *eventPtr, Tcl_Obj *script);
 static int
-FindSessions	(Tcl_Interp *interp, 
+FindSessions	(Tcl_Interp *interp,
 			     int objc, Tcl_Obj *const objv[]);
 static int
 GeneratorCmd	(ClientData	clientData, Tcl_Interp *interp,
@@ -88,11 +88,11 @@ NotifierCmd	(ClientData	clientData, Tcl_Interp *interp,
 static int
 ResponderCmd	(ClientData	clientData, Tcl_Interp *interp,
 			     int objc, Tcl_Obj *const objv[]);
-static int 
+static int
 WaitSession	(Tcl_Interp *interp, TnmSnmp *session, int id);
 
 static void
-ResponseProc	(TnmSnmp *session, TnmSnmpPdu *pdu, 
+ResponseProc	(TnmSnmp *session, TnmSnmpPdu *pdu,
 			     ClientData clientData);
 static int
 Notify		(Tcl_Interp *interp, TnmSnmp *session, int type,
@@ -101,17 +101,17 @@ static int
 Request		(Tcl_Interp *interp, TnmSnmp *session, int type,
 			     int n, int m, Tcl_Obj *vbList, Tcl_Obj *cmd);
 static Tcl_Obj*
-WalkCheck	(int oidListLen, Tcl_Obj **oidListElems, 
+WalkCheck	(int oidListLen, Tcl_Obj **oidListElems,
 			     int vbListLen, Tcl_Obj **vbListElems);
 static void
-AsyncWalkProc	(TnmSnmp *session, TnmSnmpPdu *pdu, 
+AsyncWalkProc	(TnmSnmp *session, TnmSnmpPdu *pdu,
 			     ClientData clientData);
 static int
 AsyncWalk	(Tcl_Interp *interp, TnmSnmp *session,
 			     Tcl_Obj *oidList, Tcl_Obj *tclCmd);
 static int
 SyncWalk	(Tcl_Interp *interp, TnmSnmp *session,
-			     Tcl_Obj *varName, Tcl_Obj *oidList, 
+			     Tcl_Obj *varName, Tcl_Obj *oidList,
 			     Tcl_Obj *tclCmd);
 static int
 Delta		(Tcl_Interp *interp, Tcl_Obj *vbl1,
@@ -122,10 +122,10 @@ Extract		(Tcl_Interp *interp, int what, Tcl_Obj *objPtr,
 
 #if 0
 static int
-ExpandTable	(Tcl_Interp *interp, 
+ExpandTable	(Tcl_Interp *interp,
 			     char *tList, Tcl_DString *dst);
 static int
-ExpandScalars	(Tcl_Interp *interp, 
+ExpandScalars	(Tcl_Interp *interp,
 			     char *sList, Tcl_DString *dst);
 static int
 Table		(Tcl_Interp *interp, TnmSnmp *session,
@@ -432,7 +432,7 @@ PduInit(TnmSnmpPdu *pduPtr, TnmSnmp *session, int type)
     pduPtr->type = type;
     pduPtr->requestId = TnmSnmpGetRequestId();
     pduPtr->errorStatus = TNM_SNMP_NOERROR;
-    pduPtr->errorIndex = 0;    
+    pduPtr->errorIndex = 0;
     pduPtr->trapOID = NULL;
     Tcl_DStringInit(&pduPtr->varbind);
 
@@ -491,7 +491,7 @@ GetOption(Tcl_Interp *interp, ClientData object, int option)
     case optPort:
 	return Tcl_NewIntObj(ntohs(session->maddr.sin_port));
     case optVersion:
-	return Tcl_NewStringObj(TnmGetTableValue(tnmSnmpVersionTable, 
+	return Tcl_NewStringObj(TnmGetTableValue(tnmSnmpVersionTable,
 					 (unsigned) session->version), -1);
     case optCommunity:
 	if (session->version!=TNM_SNMPv1 && session->version!=TNM_SNMPv2C) {
@@ -544,12 +544,12 @@ GetOption(Tcl_Interp *interp, ClientData object, int option)
 	if (! TNM_SNMP_USER(session)) {
             return NULL;
         }
-	return Tcl_NewStringObj(TnmGetTableValue(tnmSnmpSecurityLevelTable, 
+	return Tcl_NewStringObj(TnmGetTableValue(tnmSnmpSecurityLevelTable,
 				 (unsigned) session->securityLevel), -1);
     case optAlias:
 	return NULL;
     case optTransport:
-	return Tcl_NewStringObj(TnmGetTableValue(tnmSnmpDomainTable, 
+	return Tcl_NewStringObj(TnmGetTableValue(tnmSnmpDomainTable,
 					 (unsigned) session->domain), -1);
     case optTimeout:
 	if (session->domain != TNM_SNMP_UDP_DOMAIN) return NULL;
@@ -606,7 +606,7 @@ SetOption(Tcl_Interp *interp, ClientData object, int option, Tcl_Obj *objPtr)
     char *val;
 #endif
 
-    SnmpControl *control = (SnmpControl *) 
+    SnmpControl *control = (SnmpControl *)
 	Tcl_GetAssocData(interp, tnmSnmpControl, NULL);
 
     switch ((enum options) option) {
@@ -617,7 +617,7 @@ SetOption(Tcl_Interp *interp, ClientData object, int option, Tcl_Obj *objPtr)
 	return TnmSetIPPort(interp, "udp", Tcl_GetStringFromObj(objPtr, NULL),
 			    &session->maddr);
     case optVersion:
-	num = TnmGetTableKeyFromObj(interp, tnmSnmpVersionTable, 
+	num = TnmGetTableKeyFromObj(interp, tnmSnmpVersionTable,
 				    objPtr, "SNMP version");
 	if (num == -1) {
 	    return TCL_ERROR;
@@ -735,7 +735,7 @@ SetOption(Tcl_Interp *interp, ClientData object, int option, Tcl_Obj *objPtr)
     case optEngineID:
 	if (Tcl_ConvertToType(interp, objPtr, &tnmOctetStringType) != TCL_OK) {
 	    return TCL_ERROR;
-	} 
+	}
 #ifdef TNM_SNMPv2U
         session->version = TNM_SNMPv2U;
 #endif
@@ -769,7 +769,7 @@ SetOption(Tcl_Interp *interp, ClientData object, int option, Tcl_Obj *objPtr)
         Tcl_IncrRefCount(objPtr);
         return TCL_OK;
     case optSecurityLevel:
-	num = TnmGetTableKeyFromObj(interp, tnmSnmpSecurityLevelTable, 
+	num = TnmGetTableKeyFromObj(interp, tnmSnmpSecurityLevelTable,
 				    objPtr, "SNMP security level");
 	if (num == -1) {
 	    return TCL_ERROR;
@@ -781,7 +781,7 @@ SetOption(Tcl_Interp *interp, ClientData object, int option, Tcl_Obj *objPtr)
 	int code;
 	char *alias;
 	Tcl_DString dst;
-	entryPtr = Tcl_FindHashEntry(&control->aliasTable, 
+	entryPtr = Tcl_FindHashEntry(&control->aliasTable,
 				     Tcl_GetStringFromObj(objPtr, NULL));
 	if (! entryPtr) {
 	    Tcl_AppendResult(interp, "unknown alias \"",
@@ -796,7 +796,7 @@ SetOption(Tcl_Interp *interp, ClientData object, int option, Tcl_Obj *objPtr)
 	}
 	Tcl_SetHashValue(entryPtr, NULL);
 	Tcl_DStringInit(&dst);
-	Tcl_DStringAppend(&dst, 
+	Tcl_DStringAppend(&dst,
 			  Tcl_GetCommandName(interp, session->token), -1);
 	Tcl_DStringAppend(&dst, " configure ", -1);
 	Tcl_DStringAppend(&dst, alias, -1);
@@ -807,7 +807,7 @@ SetOption(Tcl_Interp *interp, ClientData object, int option, Tcl_Obj *objPtr)
 	return code;
     }
     case optTransport:
-	num = TnmGetTableKeyFromObj(interp, tnmSnmpDomainTable, 
+	num = TnmGetTableKeyFromObj(interp, tnmSnmpDomainTable,
 				    objPtr, "SNMP transport domain");
 	if (num == -1) {
 	    return TCL_ERROR;
@@ -882,7 +882,7 @@ BindEvent(Tcl_Interp *interp, TnmSnmp *session, Tcl_Obj *eventObjPtr, Tcl_Obj *s
     TnmSnmpBinding *bindPtr;
     TnmTable *tablePtr = NULL;
     int event;
-    
+
     /*
      * Check the allowed event types for the various session types.
      */
@@ -901,22 +901,22 @@ BindEvent(Tcl_Interp *interp, TnmSnmp *session, Tcl_Obj *eventObjPtr, Tcl_Obj *s
 	tablePtr = listenerEventTable;
 	break;
     }
-    
+
     event = TnmGetTableKey(tablePtr, Tcl_GetStringFromObj(eventObjPtr, NULL));
 
     if (event < 0) {
-	Tcl_AppendResult(interp, "unknown event \"", 
-			 Tcl_GetStringFromObj(eventObjPtr, NULL), 
+	Tcl_AppendResult(interp, "unknown event \"",
+			 Tcl_GetStringFromObj(eventObjPtr, NULL),
 			 "\": must be ", TnmGetTableValues(tablePtr),
 			 (char *) NULL);
 	return TCL_ERROR;
     }
-    
+
     bindPtr = session->bindPtr;
     while (bindPtr && bindPtr->event != event) {
 	bindPtr = bindPtr->nextPtr;
     }
-    
+
     if (! script) {
 	if (bindPtr) {
 	    Tcl_SetResult(interp, bindPtr->command, TCL_STATIC);
@@ -962,7 +962,7 @@ FindSessions(Tcl_Interp *interp, int objc, Tcl_Obj *const objv[])
     Tcl_Obj *listPtr, *patList = NULL;
     struct sockaddr_in addr;
 
-    enum options { 
+    enum options {
 	optAddress, optPort, optTags, optType, optVersion
     } option;
 
@@ -976,21 +976,21 @@ FindSessions(Tcl_Interp *interp, int objc, Tcl_Obj *const objv[])
     }
 
     for (i = 2; i < objc; i++) {
-	result = Tcl_GetIndexFromObj(interp, objv[i++], optionTable, 
+	result = Tcl_GetIndexFromObj(interp, objv[i++], optionTable,
 				     "option", TCL_EXACT, (int *) &option);
 	if (result != TCL_OK) {
 	    return result;
 	}
 	switch (option) {
 	case optAddress:
-	    result = TnmSetIPAddress(interp, 
+	    result = TnmSetIPAddress(interp,
 				  Tcl_GetStringFromObj(objv[i], NULL), &addr);
 	    if (result != TCL_OK) {
 		return TCL_ERROR;
 	    }
 	    break;
 	case optPort:
-	    result = TnmSetIPPort(interp, "udp", 
+	    result = TnmSetIPPort(interp, "udp",
 				  Tcl_GetStringFromObj(objv[i], NULL), &addr);
 	    if (result != TCL_OK) {
 		return TCL_ERROR;
@@ -1000,7 +1000,7 @@ FindSessions(Tcl_Interp *interp, int objc, Tcl_Obj *const objv[])
 	    patList = objv[i];
 	    break;
 	case optType:
-	    type = TnmGetTableKeyFromObj(interp, tnmSnmpApplTable, 
+	    type = TnmGetTableKeyFromObj(interp, tnmSnmpApplTable,
 					 objv[i], "SNMP application type");
 	    if (type == -1) {
 		return TCL_ERROR;
@@ -1064,17 +1064,17 @@ Tnm_SnmpObjCmd(ClientData clientData, Tcl_Interp *interp, int	objc, Tcl_Obj *con
     Tcl_Obj *listPtr;
     char *name, *pattern;
 
-    SnmpControl *control = (SnmpControl *) 
+    SnmpControl *control = (SnmpControl *)
 	Tcl_GetAssocData(interp, tnmSnmpControl, NULL);
 
-    enum commands { 
+    enum commands {
 	cmdAlias,
 #if 0
 	cmdArray,
 #endif
 	cmdDelta, cmdExpand, cmdFind, cmdGenerator, cmdInfo,
 	cmdListener, cmdNotifier, cmdOid, cmdResponder,
-	cmdType, cmdValue, cmdWait, cmdWatch 
+	cmdType, cmdValue, cmdWait, cmdWatch
     } cmd;
 
     static const char *cmdTable[] = {
@@ -1088,9 +1088,9 @@ Tnm_SnmpObjCmd(ClientData clientData, Tcl_Interp *interp, int	objc, Tcl_Obj *con
 	(char *) NULL
     };
 
-    enum infos { 
+    enum infos {
 	infoDomains, infoErrors, infoExceptions, infoPDUs, infoSecurity,
-	infoTypes, infoVersions 
+	infoTypes, infoVersions
     } info;
 
     static const char *infoTable[] = {
@@ -1102,7 +1102,7 @@ Tnm_SnmpObjCmd(ClientData clientData, Tcl_Interp *interp, int	objc, Tcl_Obj *con
 	control = (SnmpControl *) ckalloc(sizeof(SnmpControl));
 	memset((char *) control, 0, sizeof(SnmpControl));
 	Tcl_InitHashTable(&control->aliasTable, TCL_STRING_KEYS);
-	Tcl_SetAssocData(interp, tnmSnmpControl, AssocDeleteProc, 
+	Tcl_SetAssocData(interp, tnmSnmpControl, AssocDeleteProc,
 			 (ClientData) control);
     }
 
@@ -1118,7 +1118,7 @@ Tnm_SnmpObjCmd(ClientData clientData, Tcl_Interp *interp, int	objc, Tcl_Obj *con
 	return TCL_ERROR;
     }
 
-    code = Tcl_GetIndexFromObj(interp, objv[1], cmdTable, 
+    code = Tcl_GetIndexFromObj(interp, objv[1], cmdTable,
 			       "option", TCL_EXACT, (int *) &cmd);
     if (code != TCL_OK) {
 	return code;
@@ -1205,7 +1205,7 @@ Tnm_SnmpObjCmd(ClientData clientData, Tcl_Interp *interp, int	objc, Tcl_Obj *con
 #if 0
 	listPtr = TnmSnmpNorm(interp, objv[2], 0);
 #else
-	listPtr = TnmSnmpNorm(interp, objv[2], 
+	listPtr = TnmSnmpNorm(interp, objv[2],
 			      TNM_SNMP_NORM_OID | TNM_SNMP_NORM_INT);
 #endif
 	if (! listPtr) {
@@ -1222,7 +1222,7 @@ Tnm_SnmpObjCmd(ClientData clientData, Tcl_Interp *interp, int	objc, Tcl_Obj *con
 
     case cmdGenerator:
 
-	/* 
+	/*
 	 * Initialize the SNMP manager module by opening a socket for
 	 * manager communication. Populate the MIB module with the
 	 * set of default MIB definitions.
@@ -1236,7 +1236,7 @@ Tnm_SnmpObjCmd(ClientData clientData, Tcl_Interp *interp, int	objc, Tcl_Obj *con
 	    result = TCL_ERROR;
 	    break;
 	}
-	
+
 	session = TnmSnmpCreateSession(interp, TNM_SNMP_GENERATOR);
 	session->config = &generatorConfig;
 	result = TnmSetConfig(interp, session->config,
@@ -1271,7 +1271,7 @@ Tnm_SnmpObjCmd(ClientData clientData, Tcl_Interp *interp, int	objc, Tcl_Obj *con
 	    result = TCL_ERROR;
             break;
 	}
-	code = Tcl_GetIndexFromObj(interp, objv[2], infoTable, 
+	code = Tcl_GetIndexFromObj(interp, objv[2], infoTable,
 				   "option", TCL_EXACT, (int *) &info);
 	if (code != TCL_OK) {
 	    result = TCL_ERROR;
@@ -1309,7 +1309,7 @@ Tnm_SnmpObjCmd(ClientData clientData, Tcl_Interp *interp, int	objc, Tcl_Obj *con
 	    result = TCL_ERROR;
 	    break;
 	}
-	/* 
+	/*
 	 * Initialize the SNMP manager module for sending responses to
 	 * inform messages.
 	 */
@@ -1330,7 +1330,7 @@ Tnm_SnmpObjCmd(ClientData clientData, Tcl_Interp *interp, int	objc, Tcl_Obj *con
 	    TnmSnmpDeleteSession(session);
 	    break;
 	}
-	
+
 #ifdef TNM_SNMPv2U
 	if (session->version == TNM_SNMPv2U && session->qos & USEC_QOS_AUTH) {
 	    TnmSnmpUsecGetAgentID(session);
@@ -1344,7 +1344,7 @@ Tnm_SnmpObjCmd(ClientData clientData, Tcl_Interp *interp, int	objc, Tcl_Obj *con
 	/*
 	 * Finally create a Tcl command for this session.
 	 */
-	
+
 	name = TnmGetHandle(interp, "snmp", &nextId);
 	session->token = Tcl_CreateObjCommand(interp, name, ListenerCmd,
 			  (ClientData) session, DeleteProc);
@@ -1382,7 +1382,7 @@ Tnm_SnmpObjCmd(ClientData clientData, Tcl_Interp *interp, int	objc, Tcl_Obj *con
 	/*
 	 * Finally create a Tcl command for this session.
 	 */
-	
+
 	name = TnmGetHandle(interp, "snmp", &nextId);
 	session->token = Tcl_CreateObjCommand(interp, name, NotifierCmd,
 			  (ClientData) session, DeleteProc);
@@ -1409,7 +1409,7 @@ Tnm_SnmpObjCmd(ClientData clientData, Tcl_Interp *interp, int	objc, Tcl_Obj *con
 	}
 	session = TnmSnmpCreateSession(interp, TNM_SNMP_RESPONDER);
 	session->config = &responderConfig;
-	result = TnmSetConfig(interp, session->config, 
+	result = TnmSetConfig(interp, session->config,
 			      (ClientData) session, objc, objv);
 	if (result == TCL_OK) {
 	    Tcl_Obj *resultPtr = Tcl_GetObjResult(interp);
@@ -1438,7 +1438,7 @@ Tnm_SnmpObjCmd(ClientData clientData, Tcl_Interp *interp, int	objc, Tcl_Obj *con
 	/*
 	 * Finally create a Tcl command for this session.
 	 */
-	
+
 	name = TnmGetHandle(interp, "snmp", &nextId);
 	session->token = Tcl_CreateObjCommand(interp, name, ResponderCmd,
 			  (ClientData) session, DeleteProc);
@@ -1457,7 +1457,7 @@ Tnm_SnmpObjCmd(ClientData clientData, Tcl_Interp *interp, int	objc, Tcl_Obj *con
 	}
 	result = Extract(interp, 1, objv[2], objc == 4 ? objv[3] : NULL);
 	break;
-	
+
     case cmdValue:
 	if (objc < 3 || objc > 4) {
 	    Tcl_WrongNumArgs(interp, 2, objv, "varBindList ?index?");
@@ -1529,9 +1529,9 @@ GeneratorCmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *const
     int code, nonReps, maxReps;
 
     enum commands {
-	cmdBind, cmdCget, cmdConfigure, cmdDestroy, cmdGet, cmdGetBulk, cmdGetNext, 
+	cmdBind, cmdCget, cmdConfigure, cmdDestroy, cmdGet, cmdGetBulk, cmdGetNext,
 #ifdef ASN1_SNMP_GETRANGE
-	cmdGetRange, 
+	cmdGetRange,
 #endif
 	cmdSet, cmdWait, cmdWalk
     } cmd;
@@ -1539,7 +1539,7 @@ GeneratorCmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *const
     static const char *cmdTable[] = {
 	"bind", "cget", "configure", "destroy", "get", "getbulk", "getnext",
 #ifdef ASN1_SNMP_GETRANGE
- 	"getrange", 
+ 	"getrange",
 #endif
 	"set", "wait", "walk", (char *) NULL
     };
@@ -1549,7 +1549,7 @@ GeneratorCmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *const
 	return TCL_ERROR;
     }
 
-    code = Tcl_GetIndexFromObj(interp, objv[1], cmdTable, 
+    code = Tcl_GetIndexFromObj(interp, objv[1], cmdTable,
  			       "option", TCL_EXACT, (int *) &cmd);
     if (code != TCL_OK) {
  	return code;
@@ -1563,7 +1563,7 @@ GeneratorCmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *const
     case cmdConfigure:
 
 	/*
-	 * This call to WaitSession() is needed to ensure that a 
+	 * This call to WaitSession() is needed to ensure that a
 	 * configuration change does not affect queued requests.
 	 */
 
@@ -1627,12 +1627,12 @@ GeneratorCmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *const
 	    Tcl_WrongNumArgs(interp, 2, objv, "varBindList ?script?");
 	    return TCL_ERROR;
 	}
-	return Request(interp, session, ASN1_SNMP_GETNEXT, 0, 0, 
+	return Request(interp, session, ASN1_SNMP_GETNEXT, 0, 0,
 		       objv[2], (objc == 4) ? objv[3] : NULL);
 
     case cmdGetBulk:
 	if (objc < 5 || objc > 6) {
-	    Tcl_WrongNumArgs(interp, 2, objv, 
+	    Tcl_WrongNumArgs(interp, 2, objv,
 		    "nonRepeaters maxRepetitions varBindList ?script?");
 	    return TCL_ERROR;
 	}
@@ -1648,7 +1648,7 @@ GeneratorCmd(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *const
 #ifdef ASN1_SNMP_GETRANGE
     case cmdGetRange:
 	if (objc < 5 || objc > 6) {
-	    Tcl_WrongNumArgs(interp, 2, objv, 
+	    Tcl_WrongNumArgs(interp, 2, objv,
 		    "nonRepeaters maxRepetitions varBindList ?script?");
 	    return TCL_ERROR;
 	}
@@ -1764,13 +1764,13 @@ ListenerCmd(ClientData clientData, Tcl_Interp *interp, int	objc, Tcl_Obj *const 
 	"bind", "cget", "configure", "destroy", "wait",
 	(char *) NULL
     };
-    
+
     if (objc < 2) {
 	Tcl_WrongNumArgs(interp, 1, objv, "option ?arg arg ...?");
         return TCL_ERROR;
     }
 
-    code = Tcl_GetIndexFromObj(interp, objv[1], cmdTable, 
+    code = Tcl_GetIndexFromObj(interp, objv[1], cmdTable,
 			       "option", TCL_EXACT, (int *) &cmd);
     if (code != TCL_OK) {
 	return code;
@@ -1784,7 +1784,7 @@ ListenerCmd(ClientData clientData, Tcl_Interp *interp, int	objc, Tcl_Obj *const 
     case cmdConfigure:
 
 	/*
-	 * This call to WaitSession() is needed to ensure that a 
+	 * This call to WaitSession() is needed to ensure that a
 	 * configuration change does not affect queued requests.
 	 */
 
@@ -1867,7 +1867,7 @@ NotifierCmd(ClientData clientData, Tcl_Interp *interp, int	objc, Tcl_Obj *const 
     } cmd;
 
     static const char *cmdTable[] = {
-	"bind", "cget", "configure", "destroy", "inform", "trap", "wait", 
+	"bind", "cget", "configure", "destroy", "inform", "trap", "wait",
 	(char *) NULL
     };
 
@@ -1876,7 +1876,7 @@ NotifierCmd(ClientData clientData, Tcl_Interp *interp, int	objc, Tcl_Obj *const 
         return TCL_ERROR;
     }
 
-    code = Tcl_GetIndexFromObj(interp, objv[1], cmdTable, 
+    code = Tcl_GetIndexFromObj(interp, objv[1], cmdTable,
 			       "option", TCL_EXACT, (int *) &cmd);
     if (code != TCL_OK) {
 	return code;
@@ -1890,7 +1890,7 @@ NotifierCmd(ClientData clientData, Tcl_Interp *interp, int	objc, Tcl_Obj *const 
     case cmdConfigure:
 
 	/*
-	 * This call to WaitSession() is needed to ensure that a 
+	 * This call to WaitSession() is needed to ensure that a
 	 * configuration change does not affect queued requests.
 	 */
 
@@ -1999,7 +1999,7 @@ ResponderCmd(ClientData clientData, Tcl_Interp *interp, int	objc, Tcl_Obj *const
         return TCL_ERROR;
     }
 
-    code = Tcl_GetIndexFromObj(interp, objv[1], cmdTable, 
+    code = Tcl_GetIndexFromObj(interp, objv[1], cmdTable,
 			       "option", TCL_EXACT, (int *) &cmd);
     if (code != TCL_OK) {
 	return code;
@@ -2013,7 +2013,7 @@ ResponderCmd(ClientData clientData, Tcl_Interp *interp, int	objc, Tcl_Obj *const
     case cmdConfigure:
 
 	/*
-	 * This call to WaitSession() is needed to ensure that a 
+	 * This call to WaitSession() is needed to ensure that a
 	 * configuration change does not affect queued requests.
 	 */
 
@@ -2060,8 +2060,8 @@ ResponderCmd(ClientData clientData, Tcl_Interp *interp, int	objc, Tcl_Obj *const
 	    Tcl_WrongNumArgs(interp, 2, objv, "oid varName ?default?");
 	    return TCL_ERROR;
 	}
-	code = TnmSnmpCreateNode(session->interp, 
-				 Tcl_GetStringFromObj(objv[2], NULL), 
+	code = TnmSnmpCreateNode(session->interp,
+				 Tcl_GetStringFromObj(objv[2], NULL),
 				 Tcl_GetStringFromObj(objv[3], NULL),
 		    (objc > 4) ? Tcl_GetStringFromObj(objv[4], NULL) : "");
 	if (code != TCL_OK) {
@@ -2125,7 +2125,7 @@ WaitSession(Tcl_Interp *interp, TnmSnmp *session, int request)
 	    }
 	}
     }
-    
+
     ckfree(name);
     return TCL_OK;
 }
@@ -2151,7 +2151,7 @@ static void
 ResponseProc(TnmSnmp *session, TnmSnmpPdu *pdu, ClientData clientData)
 {
     AsyncToken *atPtr = (AsyncToken *) clientData;
-    TnmSnmpEvalCallback(atPtr->interp, session, pdu, 
+    TnmSnmpEvalCallback(atPtr->interp, session, pdu,
 			Tcl_GetStringFromObj(atPtr->tclCmd, NULL),
 			NULL, NULL, NULL, NULL);
     Tcl_DecrRefCount(atPtr->tclCmd);
@@ -2179,7 +2179,7 @@ Notify(Tcl_Interp *interp, TnmSnmp *session, int type, Tcl_Obj *oid, Tcl_Obj *vb
 {
     TnmSnmpPdu pdu;
     char *trapOid;
-    
+
     PduInit(&pdu, session, type);
     trapOid = Tcl_GetStringFromObj(oid, NULL);
     if (TnmIsOid(trapOid)) {
@@ -2187,7 +2187,7 @@ Notify(Tcl_Interp *interp, TnmSnmp *session, int type, Tcl_Obj *oid, Tcl_Obj *vb
     } else {
 	char *tmp = TnmMibGetOid(trapOid);
 	if (! tmp) {
-	    Tcl_AppendResult(interp, "unknown notification \"", 
+	    Tcl_AppendResult(interp, "unknown notification \"",
 			     trapOid, "\"", (char *) NULL);
 	    PduFree(&pdu);
 	    return TCL_ERROR;
@@ -2241,7 +2241,7 @@ Request(Tcl_Interp *interp, TnmSnmp *session, int type, int non, int max, Tcl_Ob
 	atPtr->tclCmd = cmdObj;
 	Tcl_IncrRefCount(atPtr->tclCmd);
 	atPtr->oidList = NULL;
-	code = TnmSnmpEncode(interp, session, &pdu, 
+	code = TnmSnmpEncode(interp, session, &pdu,
 			     ResponseProc, (ClientData) atPtr);
 	if (code != TCL_OK) {
 	    Tcl_DecrRefCount(atPtr->tclCmd);
@@ -2287,7 +2287,7 @@ WalkCheck(int oidListLen, Tcl_Obj **oidListElems, int vbListLen, Tcl_Obj **vbLis
     /*
      * Check if all the object identifiers are in the subtree.
      */
-    
+
     for (i = 0; i < oidListLen; i++) {
 	code = Tcl_ListObjIndex(NULL, vbListElems[i], 0, &objPtr);
 	if (code != TCL_OK || !objPtr) {
@@ -2350,7 +2350,7 @@ AsyncWalkProc(TnmSnmp *session, TnmSnmpPdu *pdu, ClientData clientData)
 #if 0
     if (pdu->errorStatus == TNM_SNMP_NOSUCHNAME) {
 	pdu->errorStatus = TNM_SNMP_ENDOFWALK;
-	TnmSnmpEvalCallback(interp, session, pdu, 
+	TnmSnmpEvalCallback(interp, session, pdu,
 			    Tcl_GetStringFromObj(atPtr->tclCmd, NULL),
 			    NULL, NULL, NULL, NULL);
 	goto done;
@@ -2358,41 +2358,41 @@ AsyncWalkProc(TnmSnmp *session, TnmSnmpPdu *pdu, ClientData clientData)
 #endif
 
     if (pdu->errorStatus != TNM_SNMP_NOERROR) {
-	TnmSnmpEvalCallback(interp, session, pdu, 
+	TnmSnmpEvalCallback(interp, session, pdu,
 			    Tcl_GetStringFromObj(atPtr->tclCmd, NULL),
 			    NULL, NULL, NULL, NULL);
 	goto done;
     }
 
-    vbList = Tcl_NewStringObj(Tcl_DStringValue(&pdu->varbind), 
+    vbList = Tcl_NewStringObj(Tcl_DStringValue(&pdu->varbind),
 			      Tcl_DStringLength(&pdu->varbind));
-    
+
     if (Tcl_ListObjGetElements(interp, atPtr->oidList,
 			       &oidListLen, &oidListElems) != TCL_OK) {
 	Tcl_Panic("AsyncWalkProc: failed to split object identifier list");
     }
-    
+
     if (Tcl_ListObjGetElements(interp, vbList,
 			       &vbListLen, &vbListElems) != TCL_OK) {
 	Tcl_Panic("AsyncWalkProc: failed to split varbind list");
     }
-    
+
     newList = WalkCheck(oidListLen, oidListElems, vbListLen, vbListElems);
     Tcl_DecrRefCount(vbList);
     if (! newList) {
 	pdu->errorStatus = TNM_SNMP_ENDOFWALK;
 	Tcl_DStringFree(&pdu->varbind);
-	TnmSnmpEvalCallback(interp, session, pdu, 
+	TnmSnmpEvalCallback(interp, session, pdu,
 			    Tcl_GetStringFromObj(atPtr->tclCmd, NULL),
 			    NULL, NULL, NULL, NULL);
 	goto done;
     }
-    TnmSnmpEvalCallback(interp, session, pdu, 
+    TnmSnmpEvalCallback(interp, session, pdu,
 			Tcl_GetStringFromObj(atPtr->tclCmd, NULL),
 			NULL, NULL, NULL, NULL);
     pdu->type = ASN1_SNMP_GETNEXT;
     pdu->requestId = TnmSnmpGetRequestId();
-    (void) TnmSnmpEncode(interp, session, pdu, AsyncWalkProc, 
+    (void) TnmSnmpEncode(interp, session, pdu, AsyncWalkProc,
 			 (ClientData) atPtr);
     Tcl_DecrRefCount(newList);
     return;
@@ -2433,9 +2433,9 @@ AsyncWalk(Tcl_Interp *interp, TnmSnmp *session, Tcl_Obj *oidList, Tcl_Obj *tclCm
 
     int oidListLen;
     Tcl_Obj **oidListElems;
-    
+
     /*
-     * Make sure our argument is a valid Tcl list where every 
+     * Make sure our argument is a valid Tcl list where every
      * element in the list is a valid object identifier.
      */
 
@@ -2469,7 +2469,7 @@ AsyncWalk(Tcl_Interp *interp, TnmSnmp *session, Tcl_Obj *oidList, Tcl_Obj *tclCm
 
     PduInit(&pdu, session, ASN1_SNMP_GETNEXT);
     Tcl_DStringAppend(&pdu.varbind, Tcl_GetStringFromObj(oidList, NULL), -1);
-    result = TnmSnmpEncode(interp, session, &pdu, 
+    result = TnmSnmpEncode(interp, session, &pdu,
 			   AsyncWalkProc, (ClientData) atPtr);
     if (result != TCL_OK) {
 	Tcl_DecrRefCount(atPtr->tclCmd);
@@ -2510,7 +2510,7 @@ SyncWalk(Tcl_Interp *interp, TnmSnmp *session, Tcl_Obj *varName, Tcl_Obj *oidLis
     int oidListLen, vbListLen;
     Tcl_Obj **oidListElems, **vbListElems, *vbList;
 
-    /* 
+    /*
      * Set warpFactor and warpLimit variables defined below control
      * how we increate the numRepeaters parameter while walking the
      * MIB tree. We currently use the sequence 4 8 12 16 20 ... 48.
@@ -2535,9 +2535,9 @@ SyncWalk(Tcl_Interp *interp, TnmSnmp *session, Tcl_Obj *varName, Tcl_Obj *oidLis
 
     int warpLimit = 48;
     int warpFactor = 4;
-    
+
     /*
-     * Make sure our argument is a valid Tcl list where every 
+     * Make sure our argument is a valid Tcl list where every
      * element in the list is a valid object identifier.
      */
 
@@ -2571,7 +2571,7 @@ SyncWalk(Tcl_Interp *interp, TnmSnmp *session, Tcl_Obj *varName, Tcl_Obj *oidLis
 	}
 
 	pdu.errorStatus = 0;
-	pdu.errorIndex  = (numRepeaters / oidListLen > 0) 
+	pdu.errorIndex  = (numRepeaters / oidListLen > 0)
 	    ? numRepeaters / oidListLen : 1;
 
 	result = TnmSnmpEncode(interp, session, &pdu, NULL, NULL);
@@ -2583,7 +2583,7 @@ SyncWalk(Tcl_Interp *interp, TnmSnmp *session, Tcl_Obj *varName, Tcl_Obj *oidLis
 	if (result != TCL_OK) {
             break;
         }
-	
+
 	result = Tcl_ListObjGetElements(interp, vbList,
 					&vbListLen, &vbListElems);
 	if (result != TCL_OK) {
@@ -2602,7 +2602,7 @@ SyncWalk(Tcl_Interp *interp, TnmSnmp *session, Tcl_Obj *varName, Tcl_Obj *oidLis
 	     * truncates the varbind list due to message size
 	     * restrictions.  We handle this case by ignoring the
 	     * trailing varbinds. Otherwise our walk would get out of
-	     * sync. 
+	     * sync.
 	     */
 	    vbListLen -= vbListLen % oidListLen;
 	    if (warpLimit > 0) {
@@ -2624,7 +2624,7 @@ SyncWalk(Tcl_Interp *interp, TnmSnmp *session, Tcl_Obj *varName, Tcl_Obj *oidLis
 	    }
 
 	    PduFree(&pdu);
-	    Tcl_DStringAppend(&pdu.varbind, 
+	    Tcl_DStringAppend(&pdu.varbind,
 			      Tcl_GetStringFromObj(newList, NULL), -1);
 
 	    if (Tcl_ObjSetVar2(interp, varName, (Tcl_Obj *) NULL,
@@ -2688,15 +2688,12 @@ SyncWalk(Tcl_Interp *interp, TnmSnmp *session, Tcl_Obj *varName, Tcl_Obj *oidLis
  */
 
 static int
-Delta(interp, obj1Ptr, obj2Ptr)
-    Tcl_Interp *interp;
-    Tcl_Obj *obj1Ptr;
-    Tcl_Obj *obj2Ptr;
+Delta(Tcl_Interp *interp, Tcl_Obj *obj1Ptr, Tcl_Obj *obj2Ptr)
 {
     Tcl_Obj *vbl1Ptr = NULL, *vbl2Ptr = NULL;
     int i, objc1, objc2;
     Tcl_Obj **objv1, **objv2;
-    
+
     /*
      * The following Tcl_Objs are allocated once and reused whenever
      * we need to expand a varbind list containing object identifiers
@@ -2745,7 +2742,7 @@ Delta(interp, obj1Ptr, obj2Ptr)
 
     (void) Tcl_ListObjGetElements(interp, vbl1Ptr, &objc1, &objv1);
     (void) Tcl_ListObjGetElements(interp, vbl2Ptr, &objc2, &objv2);
-	       
+
     if (objc1 != objc2) {
     mismatch:
 	Tcl_SetResult(interp, "varbind lists do not match", TCL_STATIC);
@@ -2756,7 +2753,7 @@ Delta(interp, obj1Ptr, obj2Ptr)
 	int dummy, type1, type2;
 	Tcl_Obj **vbv1, **vbv2, *listPtr;
 	TnmOid *oid1Ptr, *oid2Ptr;
-	
+
 	(void) Tcl_ListObjGetElements(interp, objv1[i], &dummy, &vbv1);
 	(void) Tcl_ListObjGetElements(interp, objv2[i], &dummy, &vbv2);
 	oid1Ptr = TnmGetOidFromObj(interp, vbv1[0]);
@@ -2766,7 +2763,7 @@ Delta(interp, obj1Ptr, obj2Ptr)
 	}
 
 	listPtr = Tcl_NewListObj(1, vbv1);
-	
+
 	type1 = TnmGetTableKeyFromObj(NULL, tnmSnmpTypeTable, vbv1[1], NULL);
 	type2 = TnmGetTableKeyFromObj(NULL, tnmSnmpTypeTable, vbv2[1], NULL);
 	if (type1 != type2) {
@@ -2858,7 +2855,7 @@ Extract(Tcl_Interp *interp, int what, Tcl_Obj *objPtr, Tcl_Obj *indexObjPtr)
 	    if (index < 0) {
 		index = 0;
 	    }
-	} else {	    
+	} else {
 	    char *s = Tcl_GetStringFromObj(indexObjPtr, NULL);
 	    if (strcmp(s, "end") == 0) {
 		index = -2;
@@ -2921,7 +2918,7 @@ ExpandTable(Tcl_Interp *interp, char *tList, Tcl_DString *dst)
     int i, argc, code;
     char **argv = NULL;
     TnmMibNode *nodePtr, *entryPtr = NULL, *tablePtr = NULL;
-    
+
     code = Tcl_SplitList(interp, tList, &argc, &argv);
     if (code != TCL_OK) {
 	return TCL_ERROR;
@@ -2949,7 +2946,7 @@ ExpandTable(Tcl_Interp *interp, char *tList, Tcl_DString *dst)
 	  case ASN1_SEQUENCE:
 	    entryPtr = nodePtr;
 	    break;
-	  case ASN1_SEQUENCE_OF: 
+	  case ASN1_SEQUENCE_OF:
 	    if (nodePtr->childPtr) {
 		entryPtr = nodePtr->childPtr;
 	    }
@@ -3033,9 +3030,9 @@ Table(Tcl_Interp *interp, TnmSnmp *session, char *table, char *arrayName)
     TnmSnmpPdu _pdu, *pdu = &_pdu;
     Tcl_DString varList;
     char **largv;
-    
+
     /*
-     * A special hack to make sure that the given array name 
+     * A special hack to make sure that the given array name
      * is actually known as an array.
      */
 
@@ -3050,7 +3047,7 @@ Table(Tcl_Interp *interp, TnmSnmp *session, char *table, char *arrayName)
     pdu->type        = ASN1_SNMP_GETBULK;
     pdu->requestId   = TnmSnmpGetRequestId();
     pdu->errorStatus = TNM_SNMP_NOERROR;
-    pdu->errorIndex  = 0;    
+    pdu->errorIndex  = 0;
     pdu->trapOID     = NULL;
     Tcl_DStringInit(&pdu->varbind);
     Tcl_DStringInit(&varList);
@@ -3134,19 +3131,19 @@ ExpandScalars(Tcl_Interp *interp, char *sList, Tcl_DString *dst)
 	 * Skip the node if it is a table or an entry node.
 	 */
 
-	if (nodePtr->syntax == ASN1_SEQUENCE 
+	if (nodePtr->syntax == ASN1_SEQUENCE
 	    || nodePtr->syntax == ASN1_SEQUENCE_OF) {
 	    continue;
 	}
 
 	/*
-	 * Try to expand to child nodes if the node has child nodes, 
+	 * Try to expand to child nodes if the node has child nodes,
 	 * Ignore all nodes which itsef have childs and which are
 	 * not accessible.
 	 */
 
 	if (nodePtr->childPtr) {
-	    for (nodePtr = nodePtr->childPtr; 
+	    for (nodePtr = nodePtr->childPtr;
 		 nodePtr; nodePtr=nodePtr->nextPtr) {
 		if (nodePtr->access == TNM_MIB_NOACCESS || nodePtr->childPtr) {
 		    continue;
@@ -3201,9 +3198,9 @@ Scalars(Tcl_Interp *interp, TnmSnmp *session, char *group, char *arrayName)
     Tcl_DString varList;
     Tcl_DString result;
     char **largv;
-    
+
     /*
-     * A special hack to make sure that the given array name 
+     * A special hack to make sure that the given array name
      * is actually known as an array.
      */
 
@@ -3218,7 +3215,7 @@ Scalars(Tcl_Interp *interp, TnmSnmp *session, char *group, char *arrayName)
     pdu->type        = ASN1_SNMP_GET;
     pdu->requestId   = TnmSnmpGetRequestId();
     pdu->errorStatus = TNM_SNMP_NOERROR;
-    pdu->errorIndex  = 0;    
+    pdu->errorIndex  = 0;
     pdu->trapOID     = NULL;
     Tcl_DStringInit(&pdu->varbind);
     Tcl_DStringInit(&varList);
@@ -3246,7 +3243,7 @@ Scalars(Tcl_Interp *interp, TnmSnmp *session, char *group, char *arrayName)
     Tcl_DStringAppend(&pdu->varbind, Tcl_DStringValue(&varList),
 		      Tcl_DStringLength(&varList));
     code = TnmSnmpEncode(interp, session, pdu, NULL, NULL);
-    if (code == TCL_OK) {	
+    if (code == TCL_OK) {
 	ScalarSetVar(interp, interp->result, arrayName, &result);
 	Tcl_DStringFree(&varList);
 	Tcl_DStringResult(interp, &result);
@@ -3279,7 +3276,7 @@ Scalars(Tcl_Interp *interp, TnmSnmp *session, char *group, char *arrayName)
 	pdu->type        = ASN1_SNMP_GET;
 	pdu->requestId   = TnmSnmpGetRequestId();
 	pdu->errorStatus = TNM_SNMP_NOERROR;
-	pdu->errorIndex  = 0;    
+	pdu->errorIndex  = 0;
 	Tcl_DStringInit(&pdu->varbind);
 	Tcl_DStringAppend(&pdu->varbind, largv[i], -1);
 
@@ -3328,7 +3325,7 @@ ScalarSetVar(Tcl_Interp *interp, char *vbl, char *varName, Tcl_DString *result)
     if (code != TCL_OK) {
 	return;
     }
-    
+
     for (i = 0; i < TnmVectorSize(&vector); i++) {
 	vbPtr = (TnmSnmpVarBind *) TnmVectorGet(&vector, i);
 	if (TnmSnmpException(vbPtr->syntax)) {
@@ -3346,5 +3343,5 @@ ScalarSetVar(Tcl_Interp *interp, char *vbl, char *varName, Tcl_DString *result)
     TnmSnmpVarBindFree(&vector);
     TnmVectorFree(&vector);
 }
-#endif
+#endif /* 0 */
 

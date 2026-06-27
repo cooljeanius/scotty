@@ -11,7 +11,7 @@
 #include "pcnfsd.h"
 
 #if RPC_SVC
- void msg_out(msg) char *msg; {_msgout(msg);}
+ void msg_out(char *msg) {_msgout(msg);}
 #endif
 #if RPC_HDR
  extern void msg_out();

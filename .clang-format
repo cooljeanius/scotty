@@ -1,0 +1,13 @@
+# -*- yaml -*-
+
+# To save a click, here is the link to the clang-format docs:
+# https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+
+# Options here are generally in alphabetical order.
+
+# Note: incomplete; avoid using until further investigation
+
+Language: Cpp
+BreakAfterReturnType: # Neither ExceptShortType nor TopLevelDefinitions do quite what I want…
+BreakBeforeBraces: Linux
+SpaceBeforeParens: ControlStatementsExceptControlMacros

@@ -14,8 +14,8 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+# include <config.h>
+#endif /* HAVE_CONFIG_H */
 
 #include "tnmSnmp.h"
 #include "tnmMib.h"
@@ -130,7 +130,7 @@ FreeNode(TnmSnmpNode *instPtr)
  *
  * AddNode --
  *
- *	This procedure adds a new instance node to the tree 
+ *	This procedure adds a new instance node to the tree
  *	of instances.
  *
  * Results:
@@ -176,7 +176,7 @@ AddNode(char *soid, int offset, int syntax, int access, char *tclVarName)
 
 	    TnmSnmpNode *n;
 	    char *s = TnmOidToStr(oid, i+1);
-	    
+
 	    n = (TnmSnmpNode *) ckalloc(sizeof(TnmSnmpNode));
 	    memset((char *) n, 0, sizeof(TnmSnmpNode));
 	    n->label = ckstrdup(s);
@@ -191,7 +191,7 @@ AddNode(char *soid, int offset, int syntax, int access, char *tclVarName)
 		p->childPtr = n;
 
 	    } else {					/* somewhere else */
-		for (q = p->childPtr; q->nextPtr && q->nextPtr->subid < oid[i]; 
+		for (q = p->childPtr; q->nextPtr && q->nextPtr->subid < oid[i];
 		     q = q->nextPtr) ;
 		if (q->nextPtr && q->nextPtr->subid == oid[i]) {
 		    continue;
@@ -209,14 +209,14 @@ AddNode(char *soid, int offset, int syntax, int access, char *tclVarName)
 	if (q->tclVarName && q->tclVarName != tclVarName) {
 	    ckfree(q->tclVarName);
 	}
-	
+
 	q->label  = soid;
 	q->offset = offset;
 	q->syntax = syntax;
 	q->access = access;
 	q->tclVarName = tclVarName;
     }
-  
+
     return q;
 }
 
@@ -321,14 +321,14 @@ FindNode(TnmSnmpNode *root, TnmOid *oidPtr)
 {
     TnmSnmpNode *p, *q = NULL;
     int i;
-    
+
     if (TnmOidGet(oidPtr, 0) != 1) return NULL;
     for (p = root, i = 1; p && i < TnmOidGetLength(oidPtr); p = q, i++) {
 	for (q = p->childPtr; q; q = q->nextPtr) {
 	    if (q->subid == TnmOidGet(oidPtr, i)) break;
 	}
 	if (!q) {
-	    return NULL; 
+	    return NULL;
 	}
     }
     return q;
@@ -339,7 +339,7 @@ FindNode(TnmSnmpNode *root, TnmOid *oidPtr)
  *
  * RemoveNode --
  *
- *	This procedure removes all nodes from the tree that are 
+ *	This procedure removes all nodes from the tree that are
  *	associated with a given Tcl variable.
  *
  * Results:
@@ -384,7 +384,7 @@ RemoveNode(TnmSnmpNode *root, char *varName)
  *
  *	This procedure is a variable trace callback which is called
  *	by the Tcl interpreter whenever a MIB variable is removed.
- *	We have to run through the whole tree to discard these 
+ *	We have to run through the whole tree to discard these
  *	variables.
  *
  * Results:
@@ -397,16 +397,11 @@ RemoveNode(TnmSnmpNode *root, char *varName)
  */
 
 static char*
-DeleteNodeProc(clientData, interp, name1, name2, flags)
-    ClientData clientData;
-    Tcl_Interp *interp;
-    char *name1;
-    char *name2;
-    int flags;
+DeleteNodeProc(ClientData clientData, Tcl_Interp *interp, char *name1, char *name2, int flags)
 {
     size_t len = strlen(name1);
     char *varName;
-			 
+
     if (name2) {
 	len += strlen(name2);
     }
@@ -428,8 +423,8 @@ DeleteNodeProc(clientData, interp, name1, name2, flags)
  *
  * TnmSnmpCreateNode --
  *
- *	This procedure creates a new node in the instance tree 
- *	and a Tcl array variable that will be used to access and 
+ *	This procedure creates a new node in the instance tree
+ *	and a Tcl array variable that will be used to access and
  *	modify the instance from within Tcl.
  *
  * Results:
@@ -440,7 +435,7 @@ DeleteNodeProc(clientData, interp, name1, name2, flags)
  *
  *----------------------------------------------------------------------
  */
- 
+
 int
 TnmSnmpCreateNode(Tcl_Interp *interp, char *label, char *tclVarName, char *defval)
 {
@@ -450,7 +445,7 @@ TnmSnmpCreateNode(Tcl_Interp *interp, char *label, char *tclVarName, char *defva
     char *varName = NULL;
 
     if (!nodePtr || nodePtr->childPtr) {
-	Tcl_AppendResult(interp, "unknown object type \"", label, "\"", 
+	Tcl_AppendResult(interp, "unknown object type \"", label, "\"",
 			 (char *) NULL);
 	return TCL_ERROR;
     }
@@ -538,14 +533,14 @@ TnmSnmpCreateNode(Tcl_Interp *interp, char *label, char *tclVarName, char *defva
     varName = ckstrdup(tclVarName);
 
     if (defval) {
-	if (Tcl_SetVar(interp, varName, defval, 
+	if (Tcl_SetVar(interp, varName, defval,
 		       TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG) == NULL) {
 	    goto errorExit;
 	}
     }
 
     AddNode(soid, offset, syntax, access, varName);
-    Tcl_TraceVar(interp, varName, TCL_TRACE_UNSETS | TCL_GLOBAL_ONLY, 
+    Tcl_TraceVar(interp, varName, TCL_TRACE_UNSETS | TCL_GLOBAL_ONLY,
 		 (Tcl_VarTraceProc *) DeleteNodeProc, (ClientData) NULL);
     Tcl_ResetResult(interp);
     return TCL_OK;
@@ -600,8 +595,8 @@ TnmSnmpFindNextNode(TnmSnmp *session, TnmOid *oidPtr)
 {
 #if 0
     DumpTree(instTree);
-#endif
-    return FindNextNode(instTree, TnmOidGetElements(oidPtr), 
+#endif /* 0 */
+    return FindNextNode(instTree, TnmOidGetElements(oidPtr),
 			TnmOidGetLength(oidPtr));
 }
 
@@ -631,7 +626,7 @@ TnmSnmpSetNodeBinding(TnmSnmp *session, TnmOid *oidPtr, int event, char *command
     /*
      * Create an anonymous node if there is no instance known yet.
      */
-	
+
     node = FindNode(instTree, oidPtr);
     if (!node) {
 	node = AddNode(ckstrdup(TnmOidToString(oidPtr)), 0, 0, 0, NULL);
@@ -682,8 +677,8 @@ TnmSnmpSetNodeBinding(TnmSnmp *session, TnmOid *oidPtr, int event, char *command
  *	MIB node and event type.
  *
  * Results:
- *	A pointer to the command bound to this event or NULL if 
- *	there is either no node of if there is no binding for 
+ *	A pointer to the command bound to this event or NULL if
+ *	there is either no node of if there is no binding for
  *	the node.
  *
  * Side effects:
@@ -719,9 +714,9 @@ TnmSnmpGetNodeBinding(TnmSnmp *session, TnmOid *oidPtr, int event)
  * TnmSnmpEvalNodeBinding --
  *
  *	This procedure evaluates a binding for a given node. We
- *	start at the given node and follow the path to the top of 
+ *	start at the given node and follow the path to the top of
  *	the instance tree. We evaluate all bindings during our walk
- *	up the tree. A break return code can be used to stop this 
+ *	up the tree. A break return code can be used to stop this
  *	process.
  *
  * Results:
@@ -778,7 +773,7 @@ TnmSnmpEvalNodeBinding(TnmSnmp *session, TnmSnmpPdu *pdu, TnmSnmpNode *inst, int
 	    pdu->errorIndex  = 0;
 	    code = TnmSnmpEvalCallback(session->interp, session,
 				       pdu, bindPtr->command,
-				       inst->label, instOid, 
+				       inst->label, instOid,
 				       value, oldValue);
 	    pdu->errorStatus = errorStatus;
 	    pdu->errorIndex  = errorIndex;

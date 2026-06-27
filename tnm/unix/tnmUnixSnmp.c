@@ -16,8 +16,8 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+# include <config.h>
+#endif /* HAVE_CONFIG_H */
 
 #include "tnmSnmp.h"
 
@@ -29,8 +29,8 @@ extern int hexdump;		/* flag that controls hexdump */
  */
 
 #ifndef NMTRAPD
-#define NMTRAPD "/usr/local/bin/nmtrapd"
-#endif
+# define NMTRAPD "/usr/local/bin/nmtrapd"
+#endif /* !NMTRAPD */
 
 /*
  * The following variable holds the channel used to access
@@ -58,7 +58,7 @@ TrapProc		(ClientData clientData, int mask);
 
 static int
 TrapRecv		(Tcl_Interp *interp,
-				     u_char *packet, int *packetlen, 
+				     u_char *packet, int *packetlen,
 				     struct sockaddr_in *from);
 
 /*
@@ -71,7 +71,7 @@ TrapRecv		(Tcl_Interp *interp,
  *
  * Results:
  *	A standard Tcl result.
- * 
+ *
  * Side effects:
  *	None.
  *
@@ -116,12 +116,12 @@ int
 TnmSnmpNmtrapdOpen(Tcl_Interp *interp)
 {
     int i;
-    
+
     if (trap_channel) {
 	Tcl_RegisterChannel((Tcl_Interp *) NULL, trap_channel);
 	return TCL_OK;
     }
-    
+
     if (! trap_channel) {
 	trap_channel = Tcl_OpenTcpClient(interp, 1702, "localhost", 0, 0, 0);
 	if (! trap_channel) {
@@ -148,7 +148,7 @@ TnmSnmpNmtrapdOpen(Tcl_Interp *interp)
 	(void) Tcl_Close((Tcl_Interp *) NULL, trap_channel);
 	return TCL_ERROR;
     }
-    
+
     Tcl_RegisterChannel((Tcl_Interp *) NULL, trap_channel);
     Tcl_CreateChannelHandler(trap_channel, TCL_READABLE,
 			     TrapProc, (ClientData) interp);
@@ -172,7 +172,7 @@ TnmSnmpNmtrapdOpen(Tcl_Interp *interp)
  */
 
 void
-TnmSnmpNmtrapdClose()
+TnmSnmpNmtrapdClose(void)
 {
     if (trap_channel) {
 	Tcl_UnregisterChannel((Tcl_Interp *) NULL, trap_channel);
@@ -242,8 +242,8 @@ TrapRecv(Tcl_Interp *interp, u_char *packet, int *packetlen, struct sockaddr_in 
 	TnmSnmpDumpPacket(packet, *packetlen, from, NULL);
     }
 
-    /* 
-     * Finally, make sure that the socket address belongs to the 
+    /*
+     * Finally, make sure that the socket address belongs to the
      * INET address family.
      */
 

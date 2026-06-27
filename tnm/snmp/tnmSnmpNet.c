@@ -13,8 +13,8 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+# include <config.h>
+#endif /* HAVE_CONFIG_H */
 
 #include "tnmSnmp.h"
 
@@ -32,7 +32,7 @@ extern int hexdump;		/* flag that controls hexdump */
 static TnmSnmpSocket *asyncSocket = NULL;
 
 /*
- * Shared socket used for all synchronous manager initiated 
+ * Shared socket used for all synchronous manager initiated
  * interactions.
  */
 
@@ -81,7 +81,7 @@ AgentRecv		(Tcl_Interp *interp, TnmSnmp *session,
  *	A pointer to the shared socket or NULL if the socket can't
  *	be opened. An error message is left in interp->result if
  *	interp is not a NULL pointer.
- * 
+ *
  * Side effects:
  *	A real socket might be opened.
  *
@@ -160,7 +160,7 @@ TnmSnmpOpen(Tcl_Interp *interp, struct sockaddr_in *addr)
  *
  * Results:
  *	None.
- * 
+ *
  * Side effects:
  *	A real socket might be closed.
  *
@@ -192,14 +192,14 @@ TnmSnmpClose(TnmSnmpSocket *sockPtr)
  * TnmSnmpDumpPacket --
  *
  *	This procedure prints a hex dump of a packet. Useful for
- *	debugging this code. The message given in the third 
+ *	debugging this code. The message given in the third
  *	parameter should be used to identify the received packet.
- *	The fourth parameter identifies the address and port of 
+ *	The fourth parameter identifies the address and port of
  *	the sender.
  *
  * Results:
  *	None.
- * 
+ *
  * Side effects:
  *	None.
  *
@@ -216,13 +216,13 @@ TnmSnmpDumpPacket(u_char *packet, int packetlen, struct sockaddr_in *from, struc
 
     Tcl_DStringInit(&dst);
     if (from) {
-	sprintf(buf, "[%s:%u]", 
+	sprintf(buf, "[%s:%u]",
 		inet_ntoa(from->sin_addr), ntohs(from->sin_port));
 	Tcl_DStringAppend(&dst, buf, -1);
     }
     Tcl_DStringAppend(&dst, " -> ", -1);
     if (to) {
-	sprintf(buf, "[%s:%u]", 
+	sprintf(buf, "[%s:%u]",
 		inet_ntoa(to->sin_addr), ntohs(to->sin_port));
 	Tcl_DStringAppend(&dst, buf, -1);
     }
@@ -230,7 +230,7 @@ TnmSnmpDumpPacket(u_char *packet, int packetlen, struct sockaddr_in *from, struc
     Tcl_DStringAppend(&dst, buf, -1);
 
     for (cp = packet, len = 0; len < packetlen; cp += 16, len += 16) {
-	TnmHexEnc((char *) cp, 
+	TnmHexEnc((char *) cp,
 		  (packetlen - len > 16) ? 16 : packetlen - len, buf);
 	Tcl_DStringAppend(&dst, buf, -1);
 	Tcl_DStringAppend(&dst, "\n", 1);
@@ -244,12 +244,12 @@ TnmSnmpDumpPacket(u_char *packet, int packetlen, struct sockaddr_in *from, struc
  *
  * TnmSnmpWait --
  *
- *	This procedure waits for a specified time for an answer. It 
+ *	This procedure waits for a specified time for an answer. It
  *	is used to implement synchronous operations.
  *
  * Results:
  *	1 if the socket is readable, otherwise 0.
- * 
+ *
  * Side effects:
  *	None.
  *
@@ -294,7 +294,7 @@ TnmSnmpWait(int ms, int flags)
  *
  * Results:
  *	None.
- * 
+ *
  * Side effects:
  *	None.
  *
@@ -317,7 +317,7 @@ TnmSnmpDelay(TnmSnmp *session)
 	return;
     }
 
-    delta = (currentTime.sec - lastTimeStamp.sec) * 1000 
+    delta = (currentTime.sec - lastTimeStamp.sec) * 1000
 	    + (currentTime.usec - lastTimeStamp.usec) / 1000;
     wtime = session->delay - delta;
 
@@ -369,7 +369,7 @@ TnmSnmpManagerOpen(Tcl_Interp *interp)
 	if (! asyncSocket) {
 	    return TCL_ERROR;
 	}
-	TnmCreateSocketHandler(asyncSocket->sock, TCL_READABLE, 
+	TnmCreateSocketHandler(asyncSocket->sock, TCL_READABLE,
 			       ResponseProc, (ClientData) interp);
     }
     return TCL_OK;
@@ -392,7 +392,7 @@ TnmSnmpManagerOpen(Tcl_Interp *interp)
  */
 
 void
-TnmSnmpManagerClose()
+TnmSnmpManagerClose(void)
 {
     TnmSnmpClose(asyncSocket);
     asyncSocket = NULL;
@@ -484,7 +484,7 @@ TnmSnmpListenerOpen(Tcl_Interp *interp, TnmSnmp *session)
 	return TnmSnmpNmtrapdOpen(interp);
     }
 #endif
-    
+
     if (session->socket) {
 	TnmSnmpClose(session->socket);
     }
@@ -521,7 +521,7 @@ TnmSnmpListenerClose(TnmSnmp *session)
 	TnmSnmpNmtrapdClose();
     }
 #endif
-    
+
     if (session->socket) {
 	TnmSnmpClose(session->socket);
     }
@@ -567,15 +567,15 @@ TnmSnmpSend(Tcl_Interp *interp, TnmSnmp *session, u_char *packet, int packetlen,
 	sock = syncSocket->sock;
     }
 
-    code = TnmSocketSendTo(sock, packet, (size_t) packetlen, 0, 
+    code = TnmSocketSendTo(sock, packet, (size_t) packetlen, 0,
 			   (struct sockaddr *) to, sizeof(*to));
 
     if (code == TNM_SOCKET_ERROR) {
-        Tcl_AppendResult(interp, "sendto failed: ", 
+        Tcl_AppendResult(interp, "sendto failed: ",
 			 Tcl_PosixError(interp), (char *) NULL);
 	return TCL_ERROR;
     }
-    
+
     tnmSnmpStats.snmpOutPkts++;
 
 #ifdef TNM_SNMP_BENCH
@@ -590,10 +590,10 @@ TnmSnmpSend(Tcl_Interp *interp, TnmSnmp *session, u_char *packet, int packetlen,
 	if (getsockname(sock, (struct sockaddr *) &name, &namelen) == 0) {
 	    from = &name;
 	}
-	
+
 	TnmSnmpDumpPacket(packet, packetlen, from, to);
     }
-    
+
     return TCL_OK;
 }
 
@@ -602,7 +602,7 @@ TnmSnmpSend(Tcl_Interp *interp, TnmSnmp *session, u_char *packet, int packetlen,
  *
  * TnmSnmpRecv --
  *
- *	This procedure reads incoming responses from the 
+ *	This procedure reads incoming responses from the
  *	manager socket.
  *
  * Results:
@@ -739,19 +739,19 @@ TnmSnmpTimeoutProc(ClientData clientData)
     Tcl_Interp *interp = request->interp;
 
     if (request->sends < (1 + session->retries)) {
-	
-	/* 
+
+	/*
 	 * Reinstall TimerHandler for this request and retransmit
 	 * this request (keeping the original oid).
 	 */
-	
+
 #ifdef TNM_SNMPv2U
 	if (session->version == TNM_SNMPv2U && session->qos & USEC_QOS_AUTH) {
 	    TnmSnmpUsecAuth(session, request->packet, request->packetlen);
 	}
 #endif
 	TnmSnmpDelay(session);
-	TnmSnmpSend(interp, session, request->packet, request->packetlen, 
+	TnmSnmpSend(interp, session, request->packet, request->packetlen,
 		    &session->maddr, TNM_SNMP_ASYNC);
 #ifdef TNM_SNMP_BENCH
 	if (request->stats.sendSize == 0) {
@@ -769,10 +769,10 @@ TnmSnmpTimeoutProc(ClientData clientData)
 	/*
 	 * # of retransmissions reached: Evaluate the callback to
 	 * notify the application and delete this request. We fake
-	 * an empty pdu structure to conform to the callback 
+	 * an empty pdu structure to conform to the callback
 	 * conventions.
 	 */
-    
+
 	TnmSnmpPdu _pdu;
 	TnmSnmpPdu *pdu = &_pdu;
 
@@ -822,7 +822,7 @@ ResponseProc(ClientData	clientData, int mask)
     code = TnmSnmpRecv(interp, packet, &packetlen, &from, TNM_SNMP_ASYNC);
     if (code != TCL_OK) return;
 
-    code = TnmSnmpDecode(interp, packet, packetlen, &from, 
+    code = TnmSnmpDecode(interp, packet, packetlen, &from,
 			 NULL, NULL, NULL, NULL);
     if (code == TCL_ERROR) {
 	Tcl_AddErrorInfo(interp, "\n    (snmp response event)");
@@ -865,8 +865,8 @@ AgentProc(ClientData clientData, int mask)
     Tcl_ResetResult(interp);
     code = AgentRecv(interp, session, packet, &packetlen, &from);
     if (code != TCL_OK) return;
-    
-    code = TnmSnmpDecode(interp, packet, packetlen, &from, 
+
+    code = TnmSnmpDecode(interp, packet, packetlen, &from,
 			 NULL, NULL, NULL, NULL);
     if (code == TCL_ERROR) {
 	Tcl_AddErrorInfo(interp, "\n    (snmp agent event)");

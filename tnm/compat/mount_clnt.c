@@ -3,10 +3,7 @@
  * It was generated using rpcgen.
  */
 
-#include <rpc/rpc.h>
-#if !defined(__WIN32__) && !defined(_WIN32)
-#include <sys/time.h>
-#endif
+#include <memory.h> /* for memset */
 #include "mount.h"
 
 /* Default timeout can be changed using clnt_control() */
@@ -15,87 +12,104 @@ static struct timeval TIMEOUT = { 25, 0 };
 void *
 mountproc_null_1(void *argp, CLIENT *clnt)
 {
-	static char res;
+	static char clnt_res;
 
-#ifdef __WIN32__
-#define bzero(a,b) memset(a,0,b) 
-#endif
-	bzero((char *)&res, sizeof(res));
-	if (clnt_call(clnt, MOUNTPROC_NULL, xdr_void, argp, xdr_void, &res, TIMEOUT) != RPC_SUCCESS) {
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, MOUNTPROC_NULL,
+		(xdrproc_t) xdr_void, (caddr_t) argp,
+		(xdrproc_t) xdr_void, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
 		return (NULL);
 	}
-	return ((void *)&res);
+	return ((void *)&clnt_res);
 }
 
 fhstatus *
 mountproc_mnt_1(dirpath *argp, CLIENT *clnt)
 {
-	static fhstatus res;
+	static fhstatus clnt_res;
 
-	bzero((char *)&res, sizeof(res));
-	if (clnt_call(clnt, MOUNTPROC_MNT, xdr_dirpath, argp, xdr_fhstatus, &res, TIMEOUT) != RPC_SUCCESS) {
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, MOUNTPROC_MNT,
+		(xdrproc_t) xdr_dirpath, (caddr_t) argp,
+		(xdrproc_t) xdr_fhstatus, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
 		return (NULL);
 	}
-	return (&res);
+	return (&clnt_res);
 }
 
 mountlist *
 mountproc_dump_1(void *argp, CLIENT *clnt)
 {
-	static mountlist res;
+	static mountlist clnt_res;
 
-	bzero((char *)&res, sizeof(res));
-	if (clnt_call(clnt, MOUNTPROC_DUMP, xdr_void, argp, xdr_mountlist, &res, TIMEOUT) != RPC_SUCCESS) {
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, MOUNTPROC_DUMP,
+		(xdrproc_t) xdr_void, (caddr_t) argp,
+		(xdrproc_t) xdr_mountlist, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
 		return (NULL);
 	}
-	return (&res);
+	return (&clnt_res);
 }
 
 void *
 mountproc_umnt_1(dirpath *argp, CLIENT *clnt)
 {
-	static char res;
+	static char clnt_res;
 
-	bzero((char *)&res, sizeof(res));
-	if (clnt_call(clnt, MOUNTPROC_UMNT, xdr_dirpath, argp, xdr_void, &res, TIMEOUT) != RPC_SUCCESS) {
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, MOUNTPROC_UMNT,
+		(xdrproc_t) xdr_dirpath, (caddr_t) argp,
+		(xdrproc_t) xdr_void, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
 		return (NULL);
 	}
-	return ((void *)&res);
+	return ((void *)&clnt_res);
 }
 
 void *
 mountproc_umntall_1(void *argp, CLIENT *clnt)
 {
-	static char res;
+	static char clnt_res;
 
-	bzero((char *)&res, sizeof(res));
-	if (clnt_call(clnt, MOUNTPROC_UMNTALL, xdr_void, argp, xdr_void, &res, TIMEOUT) != RPC_SUCCESS) {
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, MOUNTPROC_UMNTALL,
+		(xdrproc_t) xdr_void, (caddr_t) argp,
+		(xdrproc_t) xdr_void, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
 		return (NULL);
 	}
-	return ((void *)&res);
+	return ((void *)&clnt_res);
 }
 
 exports *
 mountproc_export_1(void *argp, CLIENT *clnt)
 {
-	static exports res;
+	static exports clnt_res;
 
-	bzero((char *)&res, sizeof(res));
-	if (clnt_call(clnt, MOUNTPROC_EXPORT, xdr_void, argp, xdr_exports, &res, TIMEOUT) != RPC_SUCCESS) {
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, MOUNTPROC_EXPORT,
+		(xdrproc_t) xdr_void, (caddr_t) argp,
+		(xdrproc_t) xdr_exports, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
 		return (NULL);
 	}
-	return (&res);
+	return (&clnt_res);
 }
 
 exports *
 mountproc_exportall_1(void *argp, CLIENT *clnt)
 {
-	static exports res;
+	static exports clnt_res;
 
-	bzero((char *)&res, sizeof(res));
-	if (clnt_call(clnt, MOUNTPROC_EXPORTALL, xdr_void, argp, xdr_exports, &res, TIMEOUT) != RPC_SUCCESS) {
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, MOUNTPROC_EXPORTALL,
+		(xdrproc_t) xdr_void, (caddr_t) argp,
+		(xdrproc_t) xdr_exports, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
 		return (NULL);
 	}
-	return (&res);
+	return (&clnt_res);
 }
-

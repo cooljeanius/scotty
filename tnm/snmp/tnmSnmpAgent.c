@@ -14,8 +14,8 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+# include <config.h>
+#endif /* HAVE_CONFIG_H */
 
 #include "tnmSnmp.h"
 #include "tnmMib.h"
@@ -66,7 +66,7 @@ static char*
 TraceAgentTime		(ClientData clientData,
 				     Tcl_Interp *interp,
 				     char *name1, char *name2, int flags);
-#endif
+#endif /* TNM_SNMPv2U */
 
 static char*
 TraceUnsignedInt	(ClientData clientData,
@@ -154,9 +154,9 @@ static struct StatReg statTable[] = {
       &tnmSnmpStats.usecStatsWrongDigestValues },
     { "usecStatsUnknownContexts.0",
       &tnmSnmpStats.usecStatsUnknownContexts },
-    { "usecStatsUnknownBadParameters.0", 
+    { "usecStatsUnknownBadParameters.0",
       &tnmSnmpStats.usecStatsBadParameters },
-    { "usecStatsUnauthorizedOperations.0",   
+    { "usecStatsUnauthorizedOperations.0",
       &tnmSnmpStats.usecStatsUnauthorizedOperations },
 #endif
     { 0, 0 }
@@ -181,7 +181,7 @@ static struct StatReg statTable[] = {
  */
 
 static void
-CacheInit()
+CacheInit(void)
 {
     int i;
     memset((char *) cache, 0, sizeof(cache));
@@ -220,8 +220,8 @@ CacheGet(TnmSnmp *session, TnmSnmpPdu *pdu)
     cache[last].response.errorStatus = TNM_SNMP_NOERROR;
     cache[last].response.errorIndex = 0;
     cache[last].response.addr = pdu->addr;
-    Tcl_DStringAppend(&cache[last].request.varbind, 
-		      Tcl_DStringValue(&pdu->varbind), 
+    Tcl_DStringAppend(&cache[last].request.varbind,
+		      Tcl_DStringValue(&pdu->varbind),
 		      Tcl_DStringLength(&pdu->varbind));
     cache[last].timestamp = time((time_t *) NULL);
     return &(cache[last].response);
@@ -270,9 +270,9 @@ CacheHit(TnmSnmp *session, TnmSnmpPdu *pdu)
 	}
 	if (cache[i].response.requestId == pdu->requestId
 	    && cache[i].session == session
-	    && Tcl_DStringLength(&pdu->varbind) 
+	    && Tcl_DStringLength(&pdu->varbind)
 	       == Tcl_DStringLength(&cache[i].request.varbind)
-	    && strcmp(Tcl_DStringValue(&pdu->varbind), 
+	    && strcmp(Tcl_DStringValue(&pdu->varbind),
 		      Tcl_DStringValue(&cache[i].request.varbind)) == 0
 	    ) {
 	    cache[i].response.addr = pdu->addr;
@@ -328,12 +328,7 @@ CacheClear(TnmSnmp *session)
  */
 
 static char*
-TraceSysUpTime(clientData, interp, name1, name2, flags)
-    ClientData clientData;
-    Tcl_Interp *interp;
-    char *name1;
-    char *name2;
-    int flags;
+TraceSysUpTime(ClientData clientData, Tcl_Interp *interp, char *name1, char *name2, int flags)
 {
     char buf[20];
     sprintf(buf, "%u", TnmSnmpSysUpTime());
@@ -360,19 +355,14 @@ TraceSysUpTime(clientData, interp, name1, name2, flags)
  */
 
 static char*
-TraceAgentTime(clientData, interp, name1, name2, flags)
-    ClientData clientData;
-    Tcl_Interp *interp;
-    char *name1;
-    char *name2;
-    int flags;
+TraceAgentTime(ClientData clientData, Tcl_Interp *interp, char *name1, char *name2, int flags)
 {
     char buf[20];
     sprintf(buf, "%u", TnmSnmpSysUpTime() / 100);
     Tcl_SetVar2(interp, name1, name2, buf, TCL_GLOBAL_ONLY);
     return NULL;
 }
-#endif
+#endif /* TNM_SNMPv2U */
 
 /*
  *----------------------------------------------------------------------
@@ -393,17 +383,12 @@ TraceAgentTime(clientData, interp, name1, name2, flags)
  */
 
 static char*
-TraceUnsignedInt(clientData, interp, name1, name2, flags)
-    ClientData clientData;
-    Tcl_Interp *interp;
-    char *name1;
-    char *name2;
-    int flags;
+TraceUnsignedInt(ClientData clientData, Tcl_Interp *interp, char *name1, char *name2, int flags)
 {
     char buf[20];
     sprintf(buf, "%u", *(unsigned *) clientData);
     Tcl_SetVar2(interp, name1, name2, buf, TCL_GLOBAL_ONLY);
-    return NULL;    
+    return NULL;
 }
 
 /*
@@ -452,7 +437,7 @@ TnmSnmpAgentInit(Tcl_Interp *interp, TnmSnmp *session)
      * the "description" in RFC 2271, which is IMHO not a real cool
      * thing.
      */
-    
+
     Tcl_SetObjLength(session->engineID, 12);
     {
         u_char *p = (unsigned char *) Tcl_GetStringFromObj(session->engineID, NULL);
@@ -491,7 +476,7 @@ TnmSnmpAgentInit(Tcl_Interp *interp, TnmSnmp *session)
     session->agentTime = time((time_t *) NULL);
     session->agentBoots = session->agentTime - 820454400;
     TnmSnmpUsecSetAgentID(session);
-#endif
+#endif /* TNM_SNMPv2U */
 
     strcpy(buffer, "Tnm SNMP agent");
     value = Tcl_GetVar2(interp, "tnm", "version", TCL_GLOBAL_ONLY);
@@ -512,22 +497,22 @@ TnmSnmpAgentInit(Tcl_Interp *interp, TnmSnmp *session)
      * how clever the compiler is.
      */
 
-    TnmSnmpCreateNode(interp, "sysDescr.0", 
+    TnmSnmpCreateNode(interp, "sysDescr.0",
 		       "tnm_system(sysDescr)", buffer);
-    TnmSnmpCreateNode(interp, "sysObjectID.0", 
+    TnmSnmpCreateNode(interp, "sysObjectID.0",
 		       "tnm_system(sysObjectID)", "1.3.6.1.4.1.1575.1.1");
-    TnmSnmpCreateNode(interp, "sysUpTime.0", 
+    TnmSnmpCreateNode(interp, "sysUpTime.0",
 		       "tnm_system(sysUpTime)", "0");
-    Tcl_TraceVar2(interp, "tnm_system", "sysUpTime", 
-		  TCL_TRACE_READS | TCL_GLOBAL_ONLY, 
+    Tcl_TraceVar2(interp, "tnm_system", "sysUpTime",
+		  TCL_TRACE_READS | TCL_GLOBAL_ONLY,
 		  (Tcl_VarTraceProc *) TraceSysUpTime, (ClientData) NULL);
-    TnmSnmpCreateNode(interp, "sysContact.0", 
+    TnmSnmpCreateNode(interp, "sysContact.0",
 		       "tnm_system(sysContact)", "");
-    TnmSnmpCreateNode(interp, "sysName.0", 
+    TnmSnmpCreateNode(interp, "sysName.0",
 		       "tnm_system(sysName)", "");
-    TnmSnmpCreateNode(interp, "sysLocation.0", 
+    TnmSnmpCreateNode(interp, "sysLocation.0",
 		       "tnm_system(sysLocation)", "");
-    TnmSnmpCreateNode(interp, "sysServices.0", 
+    TnmSnmpCreateNode(interp, "sysServices.0",
 		       "tnm_system(sysServices)", "72");
 
     for (p = statTable; p->name; p++) {
@@ -535,12 +520,12 @@ TnmSnmpAgentInit(Tcl_Interp *interp, TnmSnmp *session)
 	strcat(tclvar, p->name);
 	strcat(tclvar, ")");
 	TnmSnmpCreateNode(interp, p->name, tclvar, "0");
-	Tcl_TraceVar2(interp, "tnm_snmp", p->name, 
+	Tcl_TraceVar2(interp, "tnm_snmp", p->name,
 		      TCL_TRACE_READS | TCL_GLOBAL_ONLY,
 		      (Tcl_VarTraceProc *) TraceUnsignedInt, (ClientData) p->value);
     }
 
-    /* XXX snmpEnableAuthenTraps.0 should be implemented */
+    /* XXX: snmpEnableAuthenTraps.0 should be implemented */
 
 #ifdef TNM_SNMPv2U
     TnmHexEnc((char *) session->agentID, USEC_MAX_AGENTID, buffer);
@@ -549,11 +534,11 @@ TnmSnmpAgentInit(Tcl_Interp *interp, TnmSnmp *session)
     TnmSnmpCreateNode(interp, "agentBoots.0", "tnm_usec(agentBoots)", buffer);
     TnmSnmpCreateNode(interp, "agentTime.0", "tnm_usec(agentTime)", "0");
     Tcl_TraceVar2(interp, "tnm_usec", "agentTime",
-		  TCL_TRACE_READS | TCL_GLOBAL_ONLY, 
+		  TCL_TRACE_READS | TCL_GLOBAL_ONLY,
 		  TraceAgentTime, (ClientData) NULL);
     sprintf(buffer, "%d", session->maxSize);
     TnmSnmpCreateNode(interp, "agentSize.0", "tnm_usec(agentSize)", buffer);
-#endif
+#endif /* TNM_SNMPv2U */
 
     Tcl_ResetResult(interp);
     return TCL_OK;
@@ -590,7 +575,7 @@ FindInstance(TnmSnmp *session, TnmOid *oidPtr)
  * FindNextInstance --
  *
  *	This procedure locates the next instance given by the oid in
- *	the instance tree. Ignores all tree nodes without a valid 
+ *	the instance tree. Ignores all tree nodes without a valid
  *	syntax that are only used internally as non leaf nodes.
  *
  * Results:
@@ -656,7 +641,7 @@ GetRequest(Tcl_Interp *interp, TnmSnmp *session, TnmSnmpPdu *request, TnmSnmpPdu
 	    tnmSnmpStats.snmpOutGenErrs++;
 	    goto varBindError;
 	}
-	if (request->type == ASN1_SNMP_GETNEXT 
+	if (request->type == ASN1_SNMP_GETNEXT
 	    || request->type == ASN1_SNMP_GETBULK) {
 	    inst = FindNextInstance(session, oidPtr);
 	} else {
@@ -688,7 +673,7 @@ GetRequest(Tcl_Interp *interp, TnmSnmp *session, TnmSnmpPdu *request, TnmSnmpPdu
 		    Tcl_DStringAppendElement(&response->varbind,
 					     "noSuchObject");
 		} else {
-		    Tcl_DStringAppendElement(&response->varbind, 
+		    Tcl_DStringAppendElement(&response->varbind,
 					     "noSuchInstance");
 		}
 	    } else {
@@ -705,14 +690,14 @@ GetRequest(Tcl_Interp *interp, TnmSnmp *session, TnmSnmpPdu *request, TnmSnmpPdu
 	Tcl_DStringAppendElement(&response->varbind, syntax ? syntax : "");
 
 	(void) Tcl_ListObjIndex(interp, vbListElems[i], 2, &objPtr);
-	code = TnmSnmpEvalNodeBinding(session, request, inst, 
-				      TNM_SNMP_GET_EVENT, 
+	code = TnmSnmpEvalNodeBinding(session, request, inst,
+				      TNM_SNMP_GET_EVENT,
 				      Tcl_GetStringFromObj(objPtr, NULL),
 				      (char *) NULL);
 	if (code == TCL_ERROR) {
 	    goto varBindTclError;
 	}
-	value = Tcl_GetVar(interp, inst->tclVarName, 
+	value = Tcl_GetVar(interp, inst->tclVarName,
 			   TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG);
 	if (!value) {
 	    response->errorStatus = TNM_SNMP_GENERR;
@@ -725,18 +710,18 @@ GetRequest(Tcl_Interp *interp, TnmSnmp *session, TnmSnmpPdu *request, TnmSnmpPdu
 	tnmSnmpStats.snmpInTotalReqVars++;
 
 	Tcl_DStringEndSublist(&response->varbind);
-	
+
 	continue;
 
       varBindTclError:
-	response->errorStatus = TnmGetTableKey(tnmSnmpErrorTable, 
+	response->errorStatus = TnmGetTableKey(tnmSnmpErrorTable,
 						Tcl_GetStringResult (interp));
 	if (response->errorStatus < 0) {
 	    response->errorStatus = TNM_SNMP_GENERR;
 	}
-	tnmSnmpStats.snmpOutGenErrs += 
+	tnmSnmpStats.snmpOutGenErrs +=
 	    (response->errorStatus == TNM_SNMP_GENERR);
-       
+
       varBindError:
 	response->errorIndex = i+1;
 	break;
@@ -827,14 +812,14 @@ SetRequest(Tcl_Interp *interp, TnmSnmp *session, TnmSnmpPdu *request, TnmSnmpPdu
 		    goto varBindError;
 		}
 		TnmOidFree(&oid);
-		code = TnmSnmpEvalNodeBinding(session, request, inst, 
+		code = TnmSnmpEvalNodeBinding(session, request, inst,
 				    TNM_SNMP_CREATE_EVENT, inVarBindPtr[i].value,
 				    (char *) NULL);
 		if (code == TCL_ERROR) {
 		    goto varBindTclError;
 		}
 		if (code != TCL_BREAK) {
-		    Tcl_SetVar(interp, inst->tclVarName, 
+		    Tcl_SetVar(interp, inst->tclVarName,
 			       inVarBindPtr[i].value, TCL_GLOBAL_ONLY);
 		}
 		setAlreadyDone = 1;
@@ -860,42 +845,42 @@ SetRequest(Tcl_Interp *interp, TnmSnmp *session, TnmSnmpPdu *request, TnmSnmpPdu
 	    /*
 	     * Check if the received value is of approriate type.
 	     */
-	    
-	    if (TnmGetTableKey(tnmSnmpTypeTable, 
+
+	    if (TnmGetTableKey(tnmSnmpTypeTable,
 			       inVarBindPtr[i].syntax) != inst->syntax) {
 		response->errorStatus = TNM_SNMP_WRONGTYPE;
 		varsToRollback--;
 		goto varBindError;
 	    }
 
-	    value = Tcl_GetVar(interp, inst->tclVarName, 
+	    value = Tcl_GetVar(interp, inst->tclVarName,
 			       TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG);
 	    if (value == NULL) {
 		inVarBindPtr[i].clientData = (ClientData) NULL;
 	    } else {
 		inVarBindPtr[i].clientData = (ClientData) ckstrdup(value);
 	    }
-	    code = TnmSnmpEvalNodeBinding(session, request, inst, 
+	    code = TnmSnmpEvalNodeBinding(session, request, inst,
 					TNM_SNMP_SET_EVENT, inVarBindPtr[i].value,
 					(char *) inVarBindPtr[i].clientData);
 	    if (code == TCL_ERROR) {
 		goto varBindTclError;
 	    }
 	    if (code != TCL_BREAK) {
-	        if (Tcl_SetVar(interp, inst->tclVarName, 
-			       inVarBindPtr[i].value, 
+	        if (Tcl_SetVar(interp, inst->tclVarName,
+			       inVarBindPtr[i].value,
 			       TCL_GLOBAL_ONLY) == NULL) {
 		    goto varBindTclError;
 		}
 	    }
 	    tnmSnmpStats.snmpInTotalSetVars++;
 	}
-	
+
 	Tcl_DStringStartSublist(&response->varbind);
 	Tcl_DStringAppendElement(&response->varbind, inst->label);
 	syntax = TnmGetTableValue(tnmSnmpTypeTable, (unsigned) inst->syntax);
 	Tcl_DStringAppendElement(&response->varbind, syntax ? syntax : "");
-	value = Tcl_GetVar(interp, inst->tclVarName, 
+	value = Tcl_GetVar(interp, inst->tclVarName,
 			   TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG);
 	if (!value) {
 	    response->errorStatus = TNM_SNMP_GENERR;
@@ -905,18 +890,18 @@ SetRequest(Tcl_Interp *interp, TnmSnmp *session, TnmSnmpPdu *request, TnmSnmpPdu
 	Tcl_ResetResult(interp);
 
 	Tcl_DStringEndSublist(&response->varbind);
-	
+
 	continue;
 
       varBindTclError:
-	response->errorStatus = TnmGetTableKey(tnmSnmpErrorTable, 
+	response->errorStatus = TnmGetTableKey(tnmSnmpErrorTable,
 						Tcl_GetStringResult (interp));
 	if (response->errorStatus < 0) {
 	    response->errorStatus = TNM_SNMP_GENERR;
 	}
-	tnmSnmpStats.snmpOutGenErrs += 
+	tnmSnmpStats.snmpOutGenErrs +=
 	    (response->errorStatus == TNM_SNMP_GENERR);
-       
+
       varBindError:
 	response->errorIndex = i+1;
 	break;
@@ -927,25 +912,25 @@ SetRequest(Tcl_Interp *interp, TnmSnmp *session, TnmSnmpPdu *request, TnmSnmpPdu
      * exceeds our buffer used to build the packet. This is not always
      * correct, but we should be on the safe side in most cases.
      */
-    
+
     if (Tcl_DStringLength(&response->varbind) >= TNM_SNMP_MAXSIZE) {
 	response->errorStatus = TNM_SNMP_TOOBIG;
 	response->errorIndex = 0;
     }
 
     /*
-     * Another check for consistency errors before we start 
-     * the commit/rollback phase. This additional check was 
+     * Another check for consistency errors before we start
+     * the commit/rollback phase. This additional check was
      * suggested by Peter.Polkinghorne@gec-hrc.co.uk.
      */
-    
+
     if (response->errorStatus == TNM_SNMP_NOERROR) {
 	for (i = 0; i < inVarBindSize; i++) {
 	    TnmOidFromString(&oid, inVarBindPtr[i].soid);
 	    inst = FindInstance(session, &oid);
 	    TnmOidFree(&oid);
 	    if (inst) {
-		code = TnmSnmpEvalNodeBinding(session, request, inst, 
+		code = TnmSnmpEvalNodeBinding(session, request, inst,
 				    TNM_SNMP_CHECK_EVENT, inVarBindPtr[i].value,
 				    (char *) inVarBindPtr[i].clientData);
 	    } else {
@@ -954,7 +939,7 @@ SetRequest(Tcl_Interp *interp, TnmSnmp *session, TnmSnmpPdu *request, TnmSnmpPdu
 	    }
 
 	    if (code != TCL_OK) {
-		response->errorStatus = TnmGetTableKey(tnmSnmpErrorTable, 
+		response->errorStatus = TnmGetTableKey(tnmSnmpErrorTable,
 							Tcl_GetStringResult (interp));
 		if (response->errorStatus < 0) {
 		    response->errorStatus = TNM_SNMP_GENERR;
@@ -972,15 +957,15 @@ SetRequest(Tcl_Interp *interp, TnmSnmp *session, TnmSnmpPdu *request, TnmSnmpPdu
      * careful to do rollbacks in the correct order and only
      * on those instances that were actually processed.
      */
-	
+
     if (response->errorStatus == TNM_SNMP_NOERROR) {
 
         /*
 	 * Evaluate commit bindings if we have no error yet.
-	 * Ignore all errors now since we have already decided 
+	 * Ignore all errors now since we have already decided
 	 * that this PDU has been processed successfully.
 	 */
-      
+
         for (i = 0; i < inVarBindSize; i++) {
 	    TnmOidFromString(&oid, inVarBindPtr[i].soid);
 	    inst = FindInstance(session, &oid);
@@ -1011,7 +996,7 @@ SetRequest(Tcl_Interp *interp, TnmSnmp *session, TnmSnmpPdu *request, TnmSnmpPdu
 	    inst = FindInstance(session, &oid);
 	    TnmOidFree(&oid);
 	    if (inst) {
-	        TnmSnmpEvalNodeBinding(session, request, inst, 
+	        TnmSnmpEvalNodeBinding(session, request, inst,
 			     TNM_SNMP_ROLLBACK_EVENT, inVarBindPtr[i].value,
 			     (char *) inVarBindPtr[i].clientData);
 		if (inVarBindPtr[i].flags & NODE_CREATED) {
@@ -1039,7 +1024,7 @@ SetRequest(Tcl_Interp *interp, TnmSnmp *session, TnmSnmpPdu *request, TnmSnmpPdu
  * TnmSnmpAgentRequest --
  *
  *	This procedure is called when the agent receives a get, getnext
- *	getbulk or set request. It splits the varbind, looks up the 
+ *	getbulk or set request. It splits the varbind, looks up the
  *	variables and assembles a response.
  *
  * Results:
@@ -1108,7 +1093,7 @@ TnmSnmpAgentRequest(Tcl_Interp *interp, TnmSnmp *session, TnmSnmpPdu *pdu)
 			  Tcl_DStringValue(&pdu->varbind),
 			  Tcl_DStringLength(&pdu->varbind));
     }
- 
+
     reply->type = ASN1_SNMP_RESPONSE;
     reply->requestId = pdu->requestId;
 

@@ -1,0 +1,50 @@
+# This file helps editors auto-configure whitespace settings.
+#
+# See here for more information about the format and editor support:
+#
+#   https://editorconfig.org/
+
+# top-most EditorConfig file
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+
+# Git commit messages
+[COMMIT_EDITMSG]
+indent_size = 8
+indent_style = tab
+max_line_length = 72
+trim_trailing_whitespace = true
+
+# EditorConfig files
+[.editorconfig]
+charset = utf-8
+trim_trailing_whitespace = true
+
+# Makefile
+[{Makefile*,*.mk}]
+indent_style = tab
+indent_size = 8
+trim_trailing_whitespace = true
+
+# ChangeLogs
+[ChangeLog*]
+indent_style = tab
+indent_size = 8
+trim_trailing_whitespace = true
+charset = utf-8
+
+# C/C++/Yacc
+[*.{c,h,cc,y}]
+charset = utf-8
+trim_trailing_whitespace = true
+
+# Expect / TCL
+[*.{exp,tcl}]
+trim_trailing_whitespace = true
+
+# Autoconf
+[*.{ac,m4}]
+trim_trailing_whitespace = true
